@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sattle Game</title>
+    <link rel="stylesheet" href="{% static 'sattle/styles.css' %}">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="score-container">
+            <p>Score: <span id="score">0</span></p>
+            <span class="correct-feedback">Correct!</span>
+        </div>
+        <div class="main-content">
+            <h1>Sattle Game</h1>
+            <img src="{{ image.image.url }}" alt="Satellite Image" class="satellite-image">
+            <form method="POST" action="{% url 'submit_guess' %}" id="your-form-id">
+                {% csrf_token %}
+                <label for="guessed_country">Enter your guess:</label>
+                <input type="text" id="guessed_country" name="guessed_country_no_autofill" required autocomplete="off">        
+                <input type="hidden" name="image_id" id="image_id_input" value="{{ image.id }}">
+                <button type="submit">Submit</button>
+            </form>
+            <p id="distance-message"></p>
+        </div>
+        <div class="tries-container">
+            <p>Tries left: <span id="tries-left">3</span></p>
+            <div class="incorrect-feedback-container"> <!-- Incorrect feedback within tries container -->
+                <span class="incorrect-feedback">X</span>
+                <span class="incorrect-feedback">X</span>
+                <span class="incorrect-feedback">X</span>
+            </div>
+        </div>
+    <script>
+        $(document).ready(function() {
+            $.ajaxSetup({ cache: false });
+            var countries = [
+                {% for country in countries %}
+                "{{ country }}"{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+            var tries = 3; // starting with 3 tries
+        
+            $("#guessed_country").autocomplete({
+                source: countries,
+                autoFocus: true
+            });
+        
+            function updateScore(score) {
+                $('#score').text(score);
+            }
+            function updateTries(tries) {
+                $('#tries-left').text(tries);
+            }            
+        
+            $(document).on('submit', '#your-form-id', function(e) {
+                e.preventDefault();
+                $('#distance-message').fadeOut();
+                $.post($(this).attr('action'), $(this).serialize(), function(data) {
+                    if (data.correct) {
+                        updateScore(data.score);
+                        updateImage(data.new_image_url);
+                        tries = 3; // reset the tries if the answer is correct
+                        updateTries(tries);
+                        $(".correct-feedback").fadeIn().delay(400).fadeOut(20);
+                        $(".incorrect-feedback").hide();
+                    } else {
+                        tries -= 1;
+                        updateTries(tries);
+                        if (tries <= 0) {
+                            // Show all Xs and set "tries left" to 0
+                            $(".incorrect-feedback").show();
+                            updateTries(0);
+                        
+                            let finalScore = data.score;
+                            let correctAnswerMessage = data.correct_answer ? '<br>The correct country was: <span style="color:red;">' + data.correct_answer + '</span>. ' : '<br>';
+                        
+                            $.get("{% url 'reset_score' %}", function() {
+                                updateScore(0); 
+                                $("<div title='Game Over'>Out of tries! <br>"  + "Your score was: " + finalScore + correctAnswerMessage + "</div>").dialog({
+                                    modal: true,
+                                    closeOnEscape: false, // prevent closing with the ESC key
+                                    buttons: {
+                                        Restart: function() {
+                                            $(this).dialog("close");
+                                            // Here, reset everything after player chooses to restart:
+                                            updateScore(0);
+                                            updateImage(data.new_image_url);
+                                            tries = 3;
+                                            updateTries(tries);
+                                            $(".incorrect-feedback").hide(); 
+                                        }
+                                    },
+                                    open: function(event, ui) {
+                                        // Hide the default close button
+                                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                                    }
+                                });
+                                
+                            });
+                        } else {
+                            $('#distance-message').text(data.message).fadeIn();
+                            $(`.incorrect-feedback:nth-child(${4-tries})`).fadeIn();
+                        }
+                    }
+                    updateImage(data.new_image_url);
+                    updateImageId(data.new_image_id);  
+                });
+                
+            });                     
+            function updateImage(url) {
+                $('img[alt="Satellite Image"]').attr('src', url);
+            }
+            function updateImageId(id) {
+                $('#image_id_input').val(id);
+            }      
+        });
+    </script>
+</body>
+</html>
+
