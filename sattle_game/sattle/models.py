@@ -18,3 +18,13 @@ class Guess(models.Model):
 
     def is_correct(self):
         return self.distance == 0
+
+class WebsiteStats(models.Model):
+    total_guesses = models.IntegerField(default=0)
+    total_correct_guesses = models.IntegerField(default=0)
+    total_sessions = models.IntegerField(default=0)
+
+    # This ensures we only ever have one row in this table
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(WebsiteStats, self).save(*args, **kwargs)

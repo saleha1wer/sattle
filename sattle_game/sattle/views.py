@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import SatelliteImage, Guess
+from .models import SatelliteImage, Guess, WebsiteStats
 from django.shortcuts import get_object_or_404
 import random
 import math
@@ -71,13 +71,15 @@ def home(request):
     # Get a random satellite image for the game
     request.session['score'] = 0
     random_image = random.choice(SatelliteImage.objects.all())
-
     context = {
         'image_url': random_image,
         'image': random_image,  # Add this line
         'countries': COUNTRY_CENTER_COORDS.keys()  
     }
     request.session['correct_answer'] = random_image.country
+    stats, created = WebsiteStats.objects.get_or_create(pk=1)
+    stats.total_sessions += 1
+    stats.save()
     return render(request, 'sattle/home.html', context)
 
 def submit_guess(request):
@@ -99,6 +101,10 @@ def submit_guess(request):
 
         # Save the guess
         guess = Guess(image=image, guessed_country=guessed_country, distance=distance)
+        total_guesses = Guess.objects.count()
+        if total_guesses >= 500:
+            oldest_guess = Guess.objects.earliest('id')
+            oldest_guess.delete()
         guess.save()
         session_guesses = request.session.get('guesses', [])
         session_guesses.append({
@@ -110,12 +116,17 @@ def submit_guess(request):
     })
         request.session['guesses'] = session_guesses
         # Return the correct/incorrect status based on the 'correct' value
+        stats, created = WebsiteStats.objects.get_or_create(pk=1)
+        stats.total_guesses += 1
         if correct:
             request.session['score'] = request.session.get('score', 0) + 1
             new_image = SatelliteImage.objects.order_by('?').first()
+            stats.total_correct_guesses += 1
+            stats.save()
             return JsonResponse({"correct": True, "message": "Correct!", "score": request.session['score'], "new_image_url": new_image.image.url, "new_image_id": new_image.id})
         else:
             score = request.session.get('score', 0)
+            stats.save()
             return JsonResponse({
         "correct": False,
         "message": f"The distance between the center of {guessed_country} and the image coordinates is {distance:.2f} km {direction}.",
@@ -136,5 +147,5 @@ def view_guesses(request):
         data = session.get_decoded()
         if 'guesses' in data:
             all_guesses.extend(data['guesses'])
-
-    return render(request, 'sattle/guesses.html', {'guesses': all_guesses})
+    stats = WebsiteStats.objects.get(pk=1)
+    return render(request, 'sattle/guesses.html', {'guesses': all_guesses, 'stats':stats})

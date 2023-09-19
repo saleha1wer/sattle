@@ -21,6 +21,7 @@ env = environ.Env(
 
 # Read the .env file (if it exists)
 BASE_DIR = BASE_DIR = Path('/home/salehalwer/root/sattle')
+# BASE_DIR = BASE_DIR = Path('/Users/mrsalwer/sattle')
 environ.Env.read_env(env_file=str(BASE_DIR / ".env"))
 
 BASE_DIR = Path(__file__).resolve().parent.parent
