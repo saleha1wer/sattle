@@ -20,7 +20,7 @@ env = environ.Env(
 )
 
 # Read the .env file (if it exists)
-BASE_DIR = BASE_DIR = Path('/Users/mrsalwer/sattle')
+BASE_DIR = BASE_DIR = Path('/home/salehalwer/root/sattle')
 environ.Env.read_env(env_file=str(BASE_DIR / ".env"))
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,7 +30,6 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
-
 DATABASES = {
     'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3'),
 }
