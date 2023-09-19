@@ -7,10 +7,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('admin/view-guesses/', views.view_guesses, name='view-guesses'),
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),  # Define the app's URL patterns here
+    path('', views.home, name='home'),
     path('submit_guess/', views.submit_guess, name='submit_guess'),
-     path('reset_score/', views.reset_score, name='reset_score'),
+    path('reset_score/', views.reset_score, name='reset_score'),
 ]
 
 if settings.DEBUG:  # Only serve media files in debug mode

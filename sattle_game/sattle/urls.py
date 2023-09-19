@@ -11,5 +11,7 @@ urlpatterns = [
     path('submit_guess/', views.submit_guess, name='submit_guess'),
 
     path('reset_score/', views.reset_score, name='reset_score'),
+    path('admin/view-guesses/', views.view_guesses, name='view-guesses'),
+
 ]
 

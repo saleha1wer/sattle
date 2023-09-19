@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Guesses</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Image ID</th>
+                <th>Guessed Country</th>
+                <th>Correct Country</th>
+                <th>Distance</th>
+                <th>Correct?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for guess in guesses %}
+            <tr>
+                <td>{{ guess.image_id }}</td>
+                <td>{{ guess.guessed_country }}</td>
+                <td>{{ guess.correct_country }}</td>
+                <td>{{ guess.distance }}</td>
+                <td>{{ guess.correct }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

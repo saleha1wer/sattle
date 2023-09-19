@@ -117,6 +117,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 MEDIA_URL = env.str('MEDIA_URL', default='/media/')
 MEDIA_ROOT = os.path.join(BASE_DIR, env('MEDIA_SUBDIR'))
