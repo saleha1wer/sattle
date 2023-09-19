@@ -24,18 +24,58 @@
                 <input type="hidden" name="image_id" id="image_id_input" value="{{ image.id }}">
                 <button type="submit">Submit</button>
             </form>
+            <span id="country-error" style="color:red; display:none;">Please choose from the drop-down menu.</span>
             <p id="distance-message"></p>
         </div>
-        <div class="tries-container">
-            <p>Tries left: <span id="tries-left">3</span></p>
-            <div class="incorrect-feedback-container"> <!-- Incorrect feedback within tries container -->
-                <span class="incorrect-feedback">X</span>
-                <span class="incorrect-feedback">X</span>
-                <span class="incorrect-feedback">X</span>
+        <div class="tries-skips-container">
+            <div class="tries-container">
+                <p>Tries left: <span id="tries-left">3</span></p>
+                <div class="incorrect-feedback-container"> <!-- Incorrect feedback within tries container -->
+                    <span class="incorrect-feedback">X</span>
+                    <span class="incorrect-feedback">X</span>
+                    <span class="incorrect-feedback">X</span>
+                </div>
+            </div>
+            <div class="skips-container">
+                <p>Skips left: <span id="skips-left">3</span></p>
+                <button id="skip-button">Skip</button>
             </div>
         </div>
+
     <script>
         $(document).ready(function() {
+            var skips = 3; // starting with 3 skips
+
+            function updateSkips(skips) {
+                $('#skips-left').text(skips);
+                if (skips <= 0) {
+                    $('#skip-button').prop('disabled', true);  // Disable the button when no skips left
+                }
+            }
+            $('#skip-button').click(function() {
+                if (skips > 0) {
+                    skips--;
+                    updateSkips(skips);
+                    tries = 3; // reset tries when skipped
+                    updateTries(tries);
+                    $(".incorrect-feedback").hide();
+                    // Fetch a new random image when skipping
+                    $.get("{% url 'home' %}", function(data) {
+                        $("<div title='Skipped'>The correct answer was: " + data.old_correct_answer + ".</div>").dialog({
+                            modal: true,
+                            buttons: {
+                                Okay: function() {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        });
+                        var newRandomImage = data.new_image_url;
+                        var newImageId = data.new_image_id;
+                        updateImage(newRandomImage);
+                        updateImageId(newImageId);
+                    });
+                }
+            });
             $.ajaxSetup({ cache: false });
             var countries = [
                 {% for country in countries %}
@@ -43,7 +83,9 @@
                 {% endfor %}
             ];
             var tries = 3; // starting with 3 tries
-        
+            $("#guessed_country").on('keyup', function() {
+                $('#country-error').fadeOut();
+            });
             $("#guessed_country").autocomplete({
                 source: countries,
                 autoFocus: true
@@ -57,15 +99,26 @@
             }            
         
             $(document).on('submit', '#your-form-id', function(e) {
+                console.log("Form submitted"); 
                 e.preventDefault();
+                // Validation logic
+                let selectedCountry = $("#guessed_country").val();
+                if (!countries.includes(selectedCountry)) {
+                    $('#country-error').fadeIn();
+                    return;  // Exit the submit function early
+                } else {
+                    $('#country-error').fadeOut();
+                }
                 $('#distance-message').fadeOut();
+                var form = $(this);
                 $.post($(this).attr('action'), $(this).serialize(), function(data) {
+                    $("#guessed_country").val('');
                     if (data.correct) {
                         updateScore(data.score);
                         updateImage(data.new_image_url);
                         tries = 3; // reset the tries if the answer is correct
                         updateTries(tries);
-                        $(".correct-feedback").fadeIn().delay(400).fadeOut(20);
+                        $(".correct-feedback").fadeIn().delay(2000).fadeOut(100);
                         $(".incorrect-feedback").hide();
                     } else {
                         tries -= 1;
@@ -86,12 +139,14 @@
                                     buttons: {
                                         Restart: function() {
                                             $(this).dialog("close");
-                                            // Here, reset everything after player chooses to restart:
-                                            updateScore(0);
-                                            updateImage(data.new_image_url);
-                                            tries = 3;
-                                            updateTries(tries);
-                                            $(".incorrect-feedback").hide(); 
+                                            // Fetch a new random image when restarting
+                                            $.get("{% url 'home' %}", function(data) {
+                                                var newRandomImage = data.new_image_url;
+                                                updateImage(newRandomImage);
+                                                tries = 3;
+                                                updateTries(tries);
+                                                $(".incorrect-feedback").hide(); 
+                                            });
                                         }
                                     },
                                     open: function(event, ui) {

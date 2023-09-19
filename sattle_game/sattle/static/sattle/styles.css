@@ -14,12 +14,23 @@ body {
     padding: 20px;
 }
 
-.score-container, .tries-container {
+.score-container, 
+.tries-skips-container,  /* New container wrapping both tries and skips */
+.skips-container, 
+.tries-container {
     text-align: center;
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; /* Space between the tries and skips */
+}
+
+.tries-skips-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;  /* Creates a gap between tries and skips */
 }
 
 .main-content {
@@ -34,13 +45,12 @@ h1 {
 }
 
 .satellite-image {
-    width: 450px;
+    width: 4000px;
     height: auto; /* maintain aspect ratio */
     max-width: 100%; /* make it responsive */
-    border-radius: 8px;
+    border-radius: 12px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
-
 
 form {
     margin-top: 20px;
@@ -64,6 +74,7 @@ form {
 .incorrect-feedback {
     color: red;
 }
+
 .score-container .correct-feedback {
     display: none; /* Initially hidden */
     font-size: 1.5em;

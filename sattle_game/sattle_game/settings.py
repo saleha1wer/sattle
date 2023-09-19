@@ -10,23 +10,30 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import environ
 from pathlib import Path
 import os
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Initialize environment variables
+env = environ.Env(
+    DEBUG=(bool, False),
+    # Add default values for other environment variables if needed
+)
+
+# Read the .env file (if it exists)
+BASE_DIR = BASE_DIR = Path('/Users/mrsalwer/sattle')
+environ.Env.read_env(env_file=str(BASE_DIR / ".env"))
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = env('SECRET_KEY')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+DEBUG = env('DEBUG')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0b4qolylc!qs)95xc56*)97w+917+ed0rs0uliiqlva4romb_z'
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+DATABASES = {
+    'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3'),
+}
 
 # Application definition
 
@@ -71,17 +78,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sattle_game.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -123,5 +119,5 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_URL = env.str('MEDIA_URL', default='/media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, env('MEDIA_SUBDIR'))
