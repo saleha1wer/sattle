@@ -51,6 +51,9 @@
                 if (skips <= 0) {
                     $('#skip-button').prop('disabled', true);  // Disable the button when no skips left
                 }
+                if (skips>0){
+                    $('#skip-button').prop('disabled', false);
+                }
             }
             $('#skip-button').click(function() {
                 if (skips > 0) {
@@ -145,6 +148,7 @@
                                                 updateImage(newRandomImage);
                                                 tries = 3;
                                                 updateTries(tries);
+                                                updateSkips(3)
                                                 $(".incorrect-feedback").hide(); 
                                             });
                                         }
