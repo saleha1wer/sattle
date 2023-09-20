@@ -10,9 +10,12 @@ class SatelliteImage(models.Model):
 class Guess(models.Model):
     image = models.ForeignKey(SatelliteImage, on_delete=models.CASCADE)
     guessed_country = models.CharField(max_length=100)
+    correct_country = models.CharField(max_length=100, null=True, blank=True)
     distance = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
-
+    user_identifier = models.CharField(max_length=255, null=True, blank=True)
+    correct = models.BooleanField(null=True, blank=True)
+    direction = models.CharField(max_length=255, null=True, blank=True)
     def __str__(self):
         return f"Guess for {self.image.country}"
 

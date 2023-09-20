@@ -11,7 +11,10 @@
                 <th>Guessed Country</th>
                 <th>Correct Country</th>
                 <th>Distance</th>
+                <th>Direction</th>
                 <th>Correct?</th>
+                <th>Time Stamp</th>
+                <th>User ID</th>
             </tr>
         </thead>
         <tbody>
@@ -21,7 +24,11 @@
                 <td>{{ guess.guessed_country }}</td>
                 <td>{{ guess.correct_country }}</td>
                 <td>{{ guess.distance }}</td>
+                <td>{{ guess.direction }}</td>
                 <td>{{ guess.correct }}</td>
+                <td>{{ guess.timestamp }}</td>
+                <td>{{ guess.user_identifier }}</td>
+
             </tr>
             {% endfor %}
         </tbody>
