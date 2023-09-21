@@ -104,6 +104,7 @@
             $(document).on('submit', '#your-form-id', function(e) {
                 console.log("Form submitted"); 
                 e.preventDefault();
+                $("button[type='submit']").prop("disabled", true);
                 // Validation logic
                 let selectedCountry = $("#guessed_country").val();
                 if (!countries.includes(selectedCountry)) {
@@ -166,8 +167,11 @@
                         }
                     }
                     updateImage(data.new_image_url);
-                    updateImageId(data.new_image_id);  
-                });
+                    updateImageId(data.new_image_id);
+                    $("button[type='submit']").prop("disabled", false);
+                }).fail(function() {  // handle network errors or server errors
+                        $("button[type='submit']").prop("disabled", false);
+                });;
                 
             });                     
             function updateImage(url) {

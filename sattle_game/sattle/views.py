@@ -55,7 +55,7 @@ def calculate_distance(image, guessed_country):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
     distance = R * c
-    correct = True if guessed_country == image.country else False
+    correct = True if guessed_country.lower() == image.country.lower() else False
     direction = calculate_direction(lat1, lon1, lat2, lon2)
     return distance, correct, direction
     
