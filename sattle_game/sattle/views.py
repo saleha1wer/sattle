@@ -129,10 +129,6 @@ def submit_guess(request):
         'correct_answer': image.country
     })
         guess = Guess(image=image, guessed_country=guessed_country, distance=distance,user_identifier=user_identifier,correct=correct, direction=direction,correct_country=image.country)
-        total_guesses = Guess.objects.count()
-        if total_guesses >= 500:
-            oldest_guess = Guess.objects.earliest('id')
-            oldest_guess.delete()
         guess.save()
     # Redirect to home if request is not POST
     return response
