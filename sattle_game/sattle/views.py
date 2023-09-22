@@ -141,10 +141,9 @@ def view_guesses(request):
     stats = WebsiteStats.objects.get(pk=1)
 
     # # Stats for the last 24 hours
-    # last_24_hours = datetime.now() - timedelta(days=1)
-    # total_guesses_24h = Guess.objects.filter(timestamp__gte=last_24_hours).count()
-    # total_correct_guesses_24h = Guess.objects.filter(timestamp__gte=last_24_hours, correct=True).count()
-    # total_sessions_24h = WebsiteStats.objects.filter(timestamp__gte=last_24_hours).count()
+    last_24_hours = datetime.now() - timedelta(days=1)
+    total_guesses_24h = Guess.objects.filter(timestamp__gte=last_24_hours).count()
+    total_correct_guesses_24h = Guess.objects.filter(timestamp__gte=last_24_hours, correct=True).count()
 
     # User table stats
     user_stats = Guess.objects.values('user_identifier').annotate(
@@ -155,7 +154,9 @@ def view_guesses(request):
     context = {
         'guesses': all_guesses,
         'stats': stats,
-        'user_stats': user_stats
+        'user_stats': user_stats,
+        'total_guesses_24h': total_guesses_24h,
+        'total_correct_guesses_24h': total_correct_guesses_24h,
     }
 
     return render(request, 'sattle/guesses.html', context)
