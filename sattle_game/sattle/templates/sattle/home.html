@@ -120,6 +120,7 @@
                     if (data.correct) {
                         updateScore(data.score);
                         updateImage(data.new_image_url);
+                        updateImageId(data.new_image_id);
                         tries = 3; // reset the tries if the answer is correct
                         updateTries(tries);
                         $(".correct-feedback").fadeIn().delay(2000).fadeOut(100);
@@ -147,6 +148,7 @@
                                             $.get("{% url 'home' %}", function(data) {
                                                 var newRandomImage = data.new_image_url;
                                                 updateImage(newRandomImage);
+                                                updateImageId(data.new_image_id);
                                                 tries = 3;
                                                 updateTries(tries);
                                                 updateSkips(3)
@@ -166,8 +168,6 @@
                             $(`.incorrect-feedback:nth-child(${4-tries})`).fadeIn();
                         }
                     }
-                    updateImage(data.new_image_url);
-                    updateImageId(data.new_image_id);
                     $("button[type='submit']").prop("disabled", false);
                 }).fail(function() {  // handle network errors or server errors
                         $("button[type='submit']").prop("disabled", false);
