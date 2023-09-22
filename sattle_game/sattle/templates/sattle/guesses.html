@@ -28,17 +28,34 @@
                 <td>{{ guess.correct }}</td>
                 <td>{{ guess.timestamp }}</td>
                 <td>{{ guess.user_identifier }}</td>
-
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <body>
-        <h2>Stats:</h2>
-        <p>Total guesses: {{ stats.total_guesses }}</p>
-        <p>Total correct guesses: {{ stats.total_correct_guesses }}</p>
-        <p>Total sessions started: {{ stats.total_sessions }}</p>
-        ...
-    </body>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Guesses Made</th>
+                <th>Correct Guesses</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in user_stats %}
+            <tr>
+                <td>{{ user.user_identifier }}</td>
+                <td>{{ user.total_guesses }}</td>
+                <td>{{ user.correct_guesses }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Stats:</h2>
+    <p>Total guesses: {{ stats.total_guesses }} (Last 24 hours: {{ total_guesses_24h }})</p>
+    <p>Total correct guesses: {{ stats.total_correct_guesses }} (Last 24 hours: {{ total_correct_guesses_24h }})</p>
+    <p>Total sessions started: {{ stats.total_sessions }} (Last 24 hours: {{ total_sessions_24h }})</p>
+    ...
 </body>
 </html>

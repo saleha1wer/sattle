@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from .models import SatelliteImage, Guess, WebsiteStats
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q
+from datetime import datetime, timedelta
 import random
 import math
 from django.http import JsonResponse
@@ -141,5 +143,23 @@ def view_guesses(request):
     all_guesses = Guess.objects.all()
     
     stats = WebsiteStats.objects.get(pk=1)
-    
-    return render(request, 'sattle/guesses.html', {'guesses': all_guesses, 'stats': stats})
+
+    # # Stats for the last 24 hours
+    # last_24_hours = datetime.now() - timedelta(days=1)
+    # total_guesses_24h = Guess.objects.filter(timestamp__gte=last_24_hours).count()
+    # total_correct_guesses_24h = Guess.objects.filter(timestamp__gte=last_24_hours, correct=True).count()
+    # total_sessions_24h = WebsiteStats.objects.filter(timestamp__gte=last_24_hours).count()
+
+    # User table stats
+    user_stats = Guess.objects.values('user_identifier').annotate(
+        total_guesses=Count('id'),
+        correct_guesses=Count('id', filter=Q(correct=True))
+    ).order_by('-total_guesses')
+
+    context = {
+        'guesses': all_guesses,
+        'stats': stats,
+        'user_stats': user_stats
+    }
+
+    return render(request, 'sattle/guesses.html', context)
