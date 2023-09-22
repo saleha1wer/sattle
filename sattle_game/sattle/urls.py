@@ -12,6 +12,7 @@ urlpatterns = [
 
     path('reset_score/', views.reset_score, name='reset_score'),
     path('admin/view-guesses/', views.view_guesses, name='view-guesses'),
+    path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
 
 ]
 

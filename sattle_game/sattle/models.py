@@ -31,3 +31,8 @@ class WebsiteStats(models.Model):
     def save(self, *args, **kwargs):
         self.pk = 1
         super(WebsiteStats, self).save(*args, **kwargs)
+
+class Feedback(models.Model):
+    feedback_text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user_identifier = models.CharField(max_length=255, null=True, blank=True)

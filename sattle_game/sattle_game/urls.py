@@ -12,6 +12,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('submit_guess/', views.submit_guess, name='submit_guess'),
     path('reset_score/', views.reset_score, name='reset_score'),
+    path('submit_feedback/', views.submit_feedback, name='submit_feedback'),
 ]
 
 if settings.DEBUG:  # Only serve media files in debug mode

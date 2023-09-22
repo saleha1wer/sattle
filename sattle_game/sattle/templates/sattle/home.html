@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
 </head>
 <body>
+    <button id="feedback-btn" class="feedback-btn">Give Feedback</button>
     <div class="container">
         <div class="score-container">
             <p>Score: <span id="score">0</span></p>
@@ -41,9 +42,36 @@
                 <button id="skip-button">Skip</button>
             </div>
         </div>
+        <div id="feedback-modal" title="Give Feedback" style="display:none;">
+            <form id="feedback-form">
+                <textarea placeholder="Write your feedback or feature suggestions here" id="feedback-text" rows="5" cols="50"></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
 
     <script>
         $(document).ready(function() {
+            $("#feedback-form").submit(function(e) {
+                e.preventDefault();
+                $.post("{% url 'submit_feedback' %}", {
+                    feedback: $("#feedback-text").val()
+                }, function(data) {
+                    if (data.success) {
+                        $("#feedback-modal").dialog("close");
+                        alert("Thank you for your feedback!");
+                    } else {
+                        alert("Error submitting feedback. Please try again.");
+                    }
+                });
+            });
+            $("#feedback-modal").dialog({
+                autoOpen: false,  // This ensures the dialog doesn't open on page load
+                modal: true,      // This makes it a modal dialog
+                width: 400        // Set a default width or any other options you need
+            });
+            $("#feedback-btn").click(function() {
+                $("#feedback-modal").dialog("open");
+            });
             var skips = 3; // starting with 3 skips
 
             function updateSkips(skips) {
