@@ -53,6 +53,9 @@
         $(document).ready(function() {
             $("#feedback-form").submit(function(e) {
                 e.preventDefault();
+                var submitButton = $(this).find("button[type='submit']");
+                submitButton.prop("disabled", true);  // Disable the button
+            
                 $.post("{% url 'submit_feedback' %}", {
                     feedback: $("#feedback-text").val()
                 }, function(data) {
@@ -62,6 +65,11 @@
                     } else {
                         alert("Error submitting feedback. Please try again.");
                     }
+                    submitButton.prop("disabled", false);  // Re-enable the button
+                })
+                .fail(function() {  // This is where you add the .fail() callback
+                    alert("Error submitting feedback. Please try again.");
+                    submitButton.prop("disabled", false);  // Re-enable the button
                 });
             });
             $("#feedback-modal").dialog({
