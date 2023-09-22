@@ -89,3 +89,48 @@ form {
     color: green;
     margin-top: 10px;
 }
+
+#feedback-btn {
+    background-color: #ff7f7f; /* Light red */
+    color: #fff; /* White text */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#feedback-btn:hover {
+    background-color: #ff5f5f; /* Slightly darker red on hover */
+}
+
+/* Styling for the feedback modal */
+#feedback-modal {
+    padding: 20px;
+}
+
+/* Styling for the feedback textarea */
+#feedback-text {
+    width: 100%; /* Full width of the modal */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: 'Arial', sans-serif;
+    resize: vertical; /* Allow vertical resizing only */
+}
+
+/* Styling for the feedback modal's submit button */
+#feedback-form button[type="submit"] {
+    background-color: #4CAF50; /* Green */
+    color: #fff; /* White text */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px; /* Space above the button */
+    transition: background-color 0.3s ease;
+}
+
+#feedback-form button[type="submit"]:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
