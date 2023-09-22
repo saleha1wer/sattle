@@ -101,7 +101,6 @@ def submit_guess(request):
 
         # Get the selected satellite image
         image = get_object_or_404(SatelliteImage, pk=image_id)
-        request.session['correct_answer'] = image.country
         # Calculate the distance
         distance, correct, direction = calculate_distance(image, guessed_country)
         user_identifier = request.COOKIES.get('user_identifier', 'unknown')
