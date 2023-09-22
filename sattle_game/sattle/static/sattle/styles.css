@@ -2,7 +2,6 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;  /* Ensure they take full height */
-    overflow: hidden;  /* Prevent scrolling on the body */
 }
 
 body {
