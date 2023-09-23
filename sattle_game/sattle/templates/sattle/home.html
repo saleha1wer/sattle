@@ -234,14 +234,15 @@
                                     buttons: {
                                         Restart: function() {
                                             $(this).dialog("close");
+                                            tries = 3;
+                                            skips = 3;
+                                            updateTries(tries);
+                                            updateSkips(skips)
                                             // Fetch a new random image when restarting
                                             $.get("{% url 'home' %}", function(data) {
                                                 var newRandomImage = data.new_image_url;
                                                 updateImage(newRandomImage);
                                                 updateImageId(data.new_image_id);
-                                                tries = 3;
-                                                updateTries(tries);
-                                                updateSkips(3)
                                                 $(".incorrect-feedback").hide(); 
                                             });
                                         }
