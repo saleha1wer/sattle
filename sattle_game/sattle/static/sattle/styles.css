@@ -170,3 +170,10 @@ form {
 #feedback-form button[type="submit"]:hover {
     background-color: #45a049; /* Slightly darker green on hover */
 }
+.inline-arrow {
+    display: inline-block;
+    width: 25px;  /* adjust as needed */
+    height: 25px; /* adjust as needed */
+    vertical-align: middle;
+    transform-origin: center;
+}
