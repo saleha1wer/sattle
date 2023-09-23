@@ -9,7 +9,6 @@
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
 </head>
 <body>
-    <button id="feedback-btn" class="feedback-btn">Give Feedback</button>
     <div class="container">
         <div class="score-container">
             <p>Score: <span id="score">0</span></p>
@@ -17,7 +16,10 @@
         </div>
         <div class="main-content">
             <h1>Sattle Game</h1>
-            <img src="{{ image.image.url }}" alt="Satellite Image" class="satellite-image">
+            <div class="image-feedback-container"> <!-- New container -->
+                <button id="feedback-btn" class="feedback-btn">Give Feedback</button>
+                <img src="{{ image.image.url }}" alt="Satellite Image" class="satellite-image">
+            </div>
             <form method="POST" action="{% url 'submit_guess' %}" id="your-form-id">
                 {% csrf_token %}
                 <label for="guessed_country">Enter your guess:</label>

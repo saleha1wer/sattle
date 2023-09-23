@@ -88,8 +88,15 @@ form {
     color: green;
     margin-top: 10px;
 }
+.image-feedback-container {
+    position: relative; /* Set to relative so we can position the button absolutely within it */
+}
+
 
 #feedback-btn {
+    position: absolute; /* Position the button absolutely within the .image-feedback-container */
+    top: -40px;         /* Position it 40px above the top edge of the container */
+    left: 0;   
     background-color: #ff7f7f; /* Light red */
     color: #fff; /* White text */
     padding: 10px 20px;
