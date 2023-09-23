@@ -148,6 +148,7 @@ def submit_guess(request):
                 "score": score, 
                 "new_image_url": new_image.image.url, 
                 "new_image_id": new_image.id,
+                'correct_answer': new_image.country,
                 'user_high_score': user_score.high_score,
                 'global_high_score':UserScore.objects.aggregate(Max('high_score'))['high_score__max'] or 0,
                 'beat_user_high_score': beat_user_high_score,
