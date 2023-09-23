@@ -17,7 +17,11 @@ class Command(BaseCommand):
             # Check if the country name matches exactly
             if image.country in country_names:
                 continue
-
+            if image.country == 'Syrian Arab Republic':
+                image.country = 'Syria'
+            if image.country == 'Russian Federation':
+                image.country = 'Russia'
+            
             # Check if the issue is just capitalization of the first letter
             capitalized_country = image.country.title()
             if capitalized_country in country_names:
