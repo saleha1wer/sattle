@@ -19,7 +19,7 @@ class Command(BaseCommand):
                 continue
 
             # Check if the issue is just capitalization of the first letter
-            capitalized_country = image.country.capitalize()
+            capitalized_country = image.country.title()
             if capitalized_country in country_names:
                 image.country = capitalized_country
                 image.save()
