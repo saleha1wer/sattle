@@ -108,13 +108,16 @@
                 }
             }
             $('#skip-button').click(function() {
+                // Disable the skip button immediately
+                $(this).prop('disabled', true);
+            
                 if (skips > 0) {
-                    $('#skip-button').prop('disabled', true);
                     skips--;
                     updateSkips(skips);
                     tries = 3; // reset tries when skipped
                     updateTries(tries);
                     $(".incorrect-feedback").hide();
+            
                     // Fetch a new random image when skipping
                     $.get("{% url 'home' %}", function(data) {
                         $("<div title='Skipped'>The correct answer was: " + data.old_correct_answer + ".</div>").dialog({
@@ -129,8 +132,13 @@
                         var newImageId = data.new_image_id;
                         updateImage(newRandomImage);
                         updateImageId(newImageId);
+                    }).always(function() {
+                        // Re-enable the skip button once the request has completed
+                        $('#skip-button').prop('disabled', false);
                     });
-                    $('#skip-button').prop('disabled', false);
+                } else {
+                    // Re-enable the skip button if skips are not greater than 0
+                    $(this).prop('disabled', false);
                 }
             });
             $.ajaxSetup({ cache: false });
