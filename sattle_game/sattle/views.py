@@ -141,7 +141,7 @@ def submit_guess(request):
                 request.session['beat_user_high_score'] = True
             if beat_global_high_score:
                 request.session['beat_global_high_score'] = True
-
+            request.session['correct_answer'] = new_image.country
             response = JsonResponse({
                 "correct": True, 
                 "message": "Correct!", 
