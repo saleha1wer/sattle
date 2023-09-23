@@ -159,9 +159,22 @@
                 $('#country-error').fadeOut();
             });
             $("#guessed_country").autocomplete({
-                source: countries,
+                source: function(request, response) {
+                    var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(request.term), "i");
+                    var beginningMatches = $.grep(countries, function(item) {
+                        return matcher.test(item);
+                    });
+                    
+                    matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                    var containsMatches = $.grep(countries, function(item) {
+                        return matcher.test(item) && beginningMatches.indexOf(item) < 0;
+                    });
+            
+                    response(beginningMatches.concat(containsMatches));
+                },
                 autoFocus: true
             });
+            
         
             function updateScore(score) {
                 $('#score').text(score);
