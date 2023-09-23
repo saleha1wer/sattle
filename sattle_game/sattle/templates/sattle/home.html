@@ -256,7 +256,7 @@
                         } else {
                             let angle = data.angle;
                             let arrowImage = `<img class="inline-arrow" style="transform: rotate(${angle}deg);" src="{% static 'sattle/arrow_up.svg' %}" alt="Direction Arrow">`;
-                            let message = `The distance from the center of ${selectedCountry} to the image coordinates is ${data.distance.toFixed(2)} km, direction: ${arrowImage}`;
+                            let message = `The distance from the center of ${selectedCountry} to the image coordinates is ${data.distance.toFixed(0)} km, direction: ${arrowImage}`;
                             $('#distance-message').html(message).fadeIn();
                             $(`.incorrect-feedback:nth-child(${4-tries})`).fadeIn();
                         }
