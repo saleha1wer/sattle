@@ -46,7 +46,7 @@
             </div>
             <div class="skips-container">
                 <p>Skips left: <span id="skips-left">3</span></p>
-                <button id="skip-button">Skip</button>
+                <button id="skip-button class="skip-button">Skip</button>
             </div>
         </div>
         <div id="feedback-modal" title="Give Feedback" style="display:none;">
@@ -107,11 +107,16 @@
                     $('#skip-button').prop('disabled', false);
                 }
             }
+            var isRequestInProgress = false;
+
             $('#skip-button').click(function() {
-                // Disable the skip button immediately
-                $(this).prop('disabled', true);
+                if (isRequestInProgress) {
+                    return; // Exit the function if a request is already in progress
+                }
             
                 if (skips > 0) {
+                    isRequestInProgress = true; // Set the flag to true to indicate a request is in progress
+            
                     skips--;
                     updateSkips(skips);
                     tries = 3; // reset tries when skipped
@@ -133,14 +138,16 @@
                         updateImage(newRandomImage);
                         updateImageId(newImageId);
                     }).always(function() {
-                        // Re-enable the skip button once the request has completed
-                        $('#skip-button').prop('disabled', false);
+                        isRequestInProgress = false; // Reset the flag once the request has completed
+                        if (tries === 0) {
+                            $('#skip-button').prop('disabled', true); // Disable the button if tries are 0
+                        }
                     });
                 } else {
-                    // Re-enable the skip button if skips are not greater than 0
-                    $(this).prop('disabled', false);
+                    $(this).prop('disabled', true); // Disable the button if skips are not greater than 0
                 }
             });
+            
             $.ajaxSetup({ cache: false });
             var countries = [
                 {% for country in countries %}
