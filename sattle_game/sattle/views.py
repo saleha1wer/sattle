@@ -120,7 +120,7 @@ def submit_guess(request):
         # Return the correct/incorrect status based on the 'correct' value
         stats, created = WebsiteStats.objects.get_or_create(pk=1)
         stats.total_guesses += 1
-        
+        request.session['old_correct_answer'] = image.country
         user_score, created = UserScore.objects.get_or_create(user_identifier=user_identifier)
         if correct:
             request.session['score'] = request.session.get('score', 0) + 1
