@@ -36,3 +36,10 @@ class Feedback(models.Model):
     feedback_text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     user_identifier = models.CharField(max_length=255, null=True, blank=True)
+
+class UserScore(models.Model):
+    user_identifier = models.CharField(max_length=255, unique=True)
+    high_score = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.user_identifier} - {self.high_score}"

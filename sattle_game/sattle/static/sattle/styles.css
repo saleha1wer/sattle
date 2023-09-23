@@ -92,7 +92,30 @@ form {
     position: relative; /* Set to relative so we can position the button absolutely within it */
 }
 
+#record-score {
+    position: absolute; /* Position it absolutely within the .image-feedback-container */
+    top: -40px;         /* Position it 40px above the top edge of the container */
+    right: 0;           /* Align it to the right edge of the container */
+    margin: 0;  /* Remove default margins */
+}
+.record-score-btn {
+    display: inline-block; /* Make it block-like but inline */
+    background-color: #7faeff; /* Light blue */
+    color: #fff; /* White text */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: absolute; /* Position it absolutely within the .image-feedback-container */
+    top: -40px;         /* Position it 40px above the top edge of the container */
+    right: 0;           /* Align it to the right edge of the container */
+    padding: 10px 15px;
+}
 
+.record-score-btn:hover {
+    background-color: #5f8eff; /* Slightly darker blue on hover */
+}
 #feedback-btn {
     position: absolute; /* Position the button absolutely within the .image-feedback-container */
     top: -40px;         /* Position it 40px above the top edge of the container */
@@ -108,6 +131,10 @@ form {
 
 #feedback-btn:hover {
     background-color: #ff5f5f; /* Slightly darker red on hover */
+}
+
+#feedback-btn, .record-score-btn {
+    font-size: 16px;  /* Adjust this value as needed */
 }
 
 /* Styling for the feedback modal */
