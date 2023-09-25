@@ -248,15 +248,30 @@ skip-button[disabled] {
 }
 /* Mobile-specific styles */
 
+/* ... (rest of your CSS above) ... */
+
 @media (max-width: 768px) {
     /* Container */
     .container {
         grid-template-columns: 1fr;
         padding: 10px;
+        grid-template-areas:
+            "title"
+            "image"
+            "form"
+            "score"
+            "tries-skips";
+    }
+
+    h1 {
+        grid-area: title;
+        margin: 0;
+        padding: 10px 0;
     }
 
     /* Satellite Image */
     .satellite-image {
+        grid-area: image;
         max-width: 100%;
         margin: 0 auto;
         position: relative;
@@ -266,21 +281,23 @@ skip-button[disabled] {
     #feedback-btn, 
     .record-score-btn {
         position: absolute;
-        top: 10px;
+        top: 5px;
         z-index: 10;
-        transform: translateY(-50%);
+        padding: 5px 10px;
+        font-size: 14px;
     }
 
     #feedback-btn {
-        left: 10px;
+        left: 5px;
     }
 
     .record-score-btn {
-        right: 10px;
+        right: 5px;
     }
 
     /* Submit Guess Field and Form */
     form {
+        grid-area: form;
         width: 100%;
         margin-top: 20px;
     }
@@ -288,14 +305,23 @@ skip-button[disabled] {
     input[type="text"], 
     button[type="submit"] {
         width: 100%;
-        padding: 15px;
+        padding: 12px;
         font-size: 16px;
         margin: 5px 0;
     }
 
+    input[type="text"] {
+        width: calc(100% - 10px); /* Adjusting width to match the submit button */
+    }
+
     /* Score and Tries Containers */
-    .score-container, 
+    .score-container {
+        grid-area: score;
+        margin-top: 20px;
+    }
+
     .tries-skips-container {
+        grid-area: tries-skips;
         margin-top: 20px;
     }
 
