@@ -248,19 +248,16 @@ skip-button[disabled] {
 }
 /* Mobile-specific styles */
 
-/* ... (rest of your CSS above) ... */
-
 @media (max-width: 768px) {
     /* Container */
     .container {
         grid-template-columns: 1fr;
         padding: 10px;
         grid-template-areas:
-            "title"
-            "image"
-            "form"
-            "score"
-            "tries-skips";
+            "title title title"
+            "feedback image record"
+            "form form form"
+            "score tries-skips tries-skips";
     }
 
     h1 {
@@ -281,17 +278,20 @@ skip-button[disabled] {
     #feedback-btn, 
     .record-score-btn {
         position: absolute;
-        top: 5px;
+        top: 50%;
         z-index: 10;
-        padding: 5px 10px;
-        font-size: 14px;
+        padding: 4px 8px; /* Making them smaller */
+        font-size: 12px; /* Making font size smaller */
+        transform: translateY(-50%);
     }
 
     #feedback-btn {
+        grid-area: feedback;
         left: 5px;
     }
 
     .record-score-btn {
+        grid-area: record;
         right: 5px;
     }
 
@@ -317,12 +317,11 @@ skip-button[disabled] {
     /* Score and Tries Containers */
     .score-container {
         grid-area: score;
-        margin-top: 20px;
+        margin-right: 10px; /* Adding some margin for spacing */
     }
 
     .tries-skips-container {
         grid-area: tries-skips;
-        margin-top: 20px;
     }
 
     /* Adjusting other elements for better mobile view */
