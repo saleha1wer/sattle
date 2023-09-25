@@ -246,3 +246,38 @@ skip-button[disabled] {
 #name-message-modal button[type="submit"]:hover {
     background-color: #0056b3;
 }
+/* Mobile-specific styles */
+@media (max-width: 768px) { /* This will target devices with a width of up to 768px, which covers most phones in portrait mode */
+    .container {
+        grid-template-columns: 1fr; /* Stack everything vertically */
+        padding: 10px;
+    }
+
+    .main-content, 
+    .score-container, 
+    .tries-skips-container {
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 20px; /* Slightly smaller heading */
+    }
+
+    .satellite-image {
+        max-width: 100%; /* Ensure images don't overflow the viewport */
+        max-height: 50vh;
+    }
+
+    button, input[type="submit"], input[type="text"], textarea {
+        width: 100%; /* Make form elements full width */
+        padding: 12px; /* Increase padding for better touch */
+    }
+
+    #record-score, 
+    .record-score-btn, 
+    #feedback-btn {
+        position: static; /* Reset positioning */
+        display: block; /* Make them block elements */
+        margin: 10px 0; /* Add some margin */
+    }
+}
