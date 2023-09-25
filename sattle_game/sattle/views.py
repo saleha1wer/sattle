@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import SatelliteImage, Guess, WebsiteStats,Feedback, UserScore
+from .models import SatelliteImage, Guess, WebsiteStats,Feedback, UserScore, GlobalHighScore
 from django.shortcuts import get_object_or_404
 from django.db.models import Count, Q, Max
 from datetime import datetime, timedelta
@@ -17,6 +17,10 @@ COUNTRY_CENTER_COORDS = {'Aruba': (12.5013629, -69.9618475), 'Afghanistan': (33.
 
 def reset_score(request):
     request.session['score'] = 0
+    request.session['beat_global_high_score'] = False
+    request.session['beat_user_high_score'] = False
+    request.session['prompt_for_name_message'] = False
+
     return JsonResponse({"message": "Score reset successfully", "score": 0})
 
 def calculate_direction(lat1, lon1, lat2, lon2):
@@ -97,6 +101,10 @@ def home(request):
         user_identifier = str(uuid.uuid4())
     response = render(request, 'sattle/home.html', context)
     response.set_cookie('user_identifier', user_identifier, max_age=60*60*24*365)
+    request.session['beat_global_high_score'] = False
+    request.session['beat_user_high_score'] = False
+    request.session['prompt_for_name_message'] = False
+
     return response
 
 def submit_guess(request):
@@ -129,18 +137,20 @@ def submit_guess(request):
             stats.total_correct_guesses += 1
             stats.save()
             beat_user_high_score, beat_global_high_score= False, False
+            global_high_score = UserScore.objects.aggregate(Max('high_score'))['high_score__max'] or 0
             if score > user_score.high_score:
                 user_score.high_score = score
                 user_score.save()
                 if not request.session.get('beat_user_high_score', False):
                     beat_user_high_score = True
-            global_high_score = UserScore.objects.aggregate(Max('high_score'))['high_score__max'] or 0
             if score > global_high_score and not request.session.get('beat_global_high_score', False):
                 beat_global_high_score = True
+
             if beat_user_high_score:
                 request.session['beat_user_high_score'] = True
             if beat_global_high_score:
                 request.session['beat_global_high_score'] = True
+                request.session['prompt_for_name_message'] = True
             request.session['correct_answer'] = new_image.country
             response = JsonResponse({
                 "correct": True, 
@@ -153,6 +163,7 @@ def submit_guess(request):
                 'global_high_score':UserScore.objects.aggregate(Max('high_score'))['high_score__max'] or 0,
                 'beat_user_high_score': beat_user_high_score,
                 'beat_global_high_score': beat_global_high_score,
+                'prompt_for_name_message':request.session.get('prompt_for_name_message', False)
                 })
         else:
             stats.save()
@@ -169,11 +180,26 @@ def submit_guess(request):
         'global_high_score':UserScore.objects.aggregate(Max('high_score'))['high_score__max'] or 0,
         'beat_global_high_score': False,
         'beat_user_high_score': False,
+        'prompt_for_name_message':request.session.get('prompt_for_name_message', False)
     })
         guess = Guess(image=image, guessed_country=guessed_country, distance=distance,user_identifier=user_identifier,correct=correct, direction=direction,correct_country=image.country)
         guess.save()
     # Redirect to home if request is not POST
     return response
+
+def save_global_high_score(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        message = request.POST.get('message')
+        score = request.POST.get('score')
+        GlobalHighScore.objects.create(name=name, message=message, score=score)
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False})
+
+def get_global_high_scores(request):
+    high_scores = GlobalHighScore.objects.all().order_by('-score')
+    data = [{"name": hs.name, "message": hs.message, "score": hs.score, "timestamp": hs.timestamp} for hs in high_scores]
+    return JsonResponse(data, safe=False)
 
 @csrf_exempt
 def submit_feedback(request):

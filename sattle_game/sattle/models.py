@@ -43,3 +43,9 @@ class UserScore(models.Model):
 
     def __str__(self):
         return f"{self.user_identifier} - {self.high_score}"
+
+class GlobalHighScore(models.Model):
+    name = models.CharField(max_length=255)
+    message = models.TextField()
+    score = models.PositiveIntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)

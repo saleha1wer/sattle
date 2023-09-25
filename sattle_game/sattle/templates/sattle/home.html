@@ -55,9 +55,75 @@
                 <button type="submit">Submit</button>
             </form>
         </div>
-
+        <div id="name-message-modal" title="Congratulations!" style="display:none;">
+            <p>You've set a new global high score! Enter your name and a message for the leaderboard:</p>
+            <form id="name-message-form">
+                {% csrf_token %}
+                <label for="name">Name:</label>
+                <input type="text" id="name" required>
+                <label for="message">Message:</label>
+                <textarea id="message" rows="5" required></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+        <div id="global-high-scores-modal" title="Global High Scores" style="display:none;">
+            <table id="high-scores-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Score</th>
+                        <th>Message</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
     <script>
         $(document).ready(function() {
+            // Define the showRestartModal function
+            function showRestartModal(finalScore, correctAnswer) {
+                let correctAnswerMessage = correctAnswer ? '<br>The correct country was: <span style="color:red;">' + correctAnswer + '</span>. ' : '<br>';
+                $("<div title='Game Over'>Out of tries! <br>"  + "Your score was: " + finalScore + correctAnswerMessage + "</div>").dialog({
+                    modal: true,
+                    closeOnEscape: false, // prevent closing with the ESC key
+                    buttons: {
+                        Restart: function() {
+                            $(this).dialog("close");
+                            tries = 3;
+                            skips = 3;
+                            updateTries(tries);
+                            updateSkips(skips);
+                            // Reset the score
+                            $.get("{% url 'reset_score' %}", function() {
+                                updateScore(0);
+                            });
+                            // Fetch a new random image when restarting
+                            $.get("{% url 'home' %}", function(data) {
+                                var newRandomImage = data.new_image_url;
+                                updateImage(newRandomImage);
+                                updateImageId(data.new_image_id);
+                                $(".incorrect-feedback").hide(); 
+                            });
+                        }
+                    },
+                    open: function(event, ui) {
+                        // Hide the default close button
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                    }
+                });
+            }
+            
+            $("#name-message-modal").dialog({
+                autoOpen: false,
+                modal: true
+            });
+            {% comment %} $("#global-high-scores-modal").dialog({
+                autoOpen: false,
+                modal: true
+            }); {% endcomment %}
             $("#congrats-modal").dialog({
                 autoOpen: false,
                 modal: true,
@@ -67,6 +133,42 @@
                     }
                 }
             });
+            $("#name-message-form").submit(function(e) {
+                e.preventDefault();
+                
+                // Get the CSRF token
+                var csrftoken = $(this).find("[name=csrfmiddlewaretoken]").val();
+                
+                // Disable the submit button to prevent multiple submissions
+                var submitButton = $(this).find("button[type='submit']");
+                submitButton.prop("disabled", true);
+            
+                $.ajax({
+                    url: "{% url 'save_global_high_score' %}",
+                    type: 'POST',
+                    data: {
+                        name: $("#name").val(),
+                        message: $("#message").val(),
+                        score: $("#score").text(),  // Assuming this is the user's score
+                        csrfmiddlewaretoken: csrftoken  // Include the CSRF token
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            $("#name-message-modal").dialog("close");
+                            alert("Your score has been recorded!");
+                        } else {
+                            alert("Error saving your score. Please try again.");
+                            // Re-enable the submit button if there's an error
+                            submitButton.prop("disabled", false);
+                        }
+                    },
+                    error: function() {
+                        alert("Error saving your score. Please try again.");
+                        // Re-enable the submit button if there's a network or server error
+                        submitButton.prop("disabled", false);
+                    }
+                });
+            });            
             $("#feedback-form").submit(function(e) {
                 e.preventDefault();
                 var submitButton = $(this).find("button[type='submit']");
@@ -95,6 +197,47 @@
             });
             $("#feedback-btn").click(function() {
                 $("#feedback-modal").dialog("open");
+            });
+            var isDialogInitialized = false;
+            $("#record-score").click(function() {
+                // Initialize the dialog only if it hasn't been initialized before
+                if (!isDialogInitialized) {
+                    $("#global-high-scores-modal").dialog({
+                        autoOpen: false,
+                        modal: true,
+                        width: 600, // Adjust width as needed
+                        buttons: {
+                            Close: function() {
+                                $(this).dialog("close");
+                            }
+                        }
+                    });
+                    isDialogInitialized = true;
+                }
+        
+                $.get("{% url 'get_global_high_scores' %}", function(data) {
+                    // Clear any existing rows
+                    $("#high-scores-table tbody").empty();
+                    
+                    // Populate the table with the new data
+                    data.forEach(function(entry) {
+                        var row = `
+                            <tr>
+                                <td>${entry.name}</td>
+                                <td>${entry.score}</td>
+                                <td>${entry.message}</td>
+                                <td>${new Date(entry.timestamp).toLocaleString()}</td>
+                            </tr>
+                        `;
+                        $("#high-scores-table tbody").append(row);
+                    });
+                    
+                    // Open the modal
+                    $("#global-high-scores-modal").dialog("open");
+                    
+                }).fail(function() {
+                    alert("Error fetching high scores. Please try again later.");
+                });
             });
             var skips = 3; // starting with 3 skips
 
@@ -190,6 +333,7 @@
                 let selectedCountry = $("#guessed_country").val();
                 if (!countries.includes(selectedCountry)) {
                     $('#country-error').fadeIn();
+                    $("button[type='submit']").prop("disabled", false)
                     return;  // Exit the submit function early
                 } else {
                     $('#country-error').fadeOut();
@@ -203,7 +347,7 @@
                         $("#high-score").text(data.user_high_score);
                         $("#global-high-score").text(data.global_high_score);
                         if (data.beat_global_high_score) {
-                            $("#congrats-message").text("Bravo! You're now the reigning champion with the highest score on the site!");
+                            $("#congrats-message").text("Bravo! You're now the reigning champion with the highest score on the site! After the end of this game, you will be prompted to enter leaderboard details.");
                             $("#congrats-modal").dialog("open");
                         } else if (data.beat_user_high_score) {
                             $("#congrats-message").text("Congratulations! You've beaten your high score!");
@@ -222,38 +366,21 @@
                             // Show all Xs and set "tries left" to 0
                             $(".incorrect-feedback").show();
                             updateTries(0);
-                        
                             let finalScore = data.score;
                             let correctAnswerMessage = data.correct_answer ? '<br>The correct country was: <span style="color:red;">' + data.correct_answer + '</span>. ' : '<br>';
-                        
-                            $.get("{% url 'reset_score' %}", function() {
-                                updateScore(0); 
-                                $("<div title='Game Over'>Out of tries! <br>"  + "Your score was: " + finalScore + correctAnswerMessage + "</div>").dialog({
-                                    modal: true,
-                                    closeOnEscape: false, // prevent closing with the ESC key
-                                    buttons: {
-                                        Restart: function() {
-                                            $(this).dialog("close");
-                                            tries = 3;
-                                            skips = 3;
-                                            updateTries(tries);
-                                            updateSkips(skips)
-                                            // Fetch a new random image when restarting
-                                            $.get("{% url 'home' %}", function(data) {
-                                                var newRandomImage = data.new_image_url;
-                                                updateImage(newRandomImage);
-                                                updateImageId(data.new_image_id);
-                                                $(".incorrect-feedback").hide(); 
-                                            });
-                                        }
+                            if (data.prompt_for_name_message) {
+                                // Show a modal to get the user's name and message
+                                $("#name-message-modal").dialog({
+                                    open: function() {
                                     },
-                                    open: function(event, ui) {
-                                        // Hide the default close button
-                                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                                    close: function() {
+                                        // This will be executed when the name-message-modal is closed
+                                        showRestartModal(data.score, data.correct_answer);
                                     }
-                                });
-                                
-                            });
+                                }).dialog("open").dialog("moveToTop");
+                            } else {
+                                showRestartModal(data.score, data.correct_answer);
+                            }
                         } else {
                             let angle = data.angle;
                             let arrowImage = `<img class="inline-arrow" style="transform: rotate(${angle}deg);" src="{% static 'sattle/arrow_up.svg' %}" alt="Direction Arrow">`;
