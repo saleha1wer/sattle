@@ -247,7 +247,7 @@ skip-button[disabled] {
     background-color: #0056b3;
 }
 /* Mobile-specific styles */
-@media (max-width: 768px) { /* This will target devices with a width of up to 768px, which covers most phones in portrait mode */
+@media (max-width: 830px) { /* This will target devices with a width of up to 768px, which covers most phones in portrait mode */
     .container {
         grid-template-columns: 1fr; /* Stack everything vertically */
         padding: 10px;
