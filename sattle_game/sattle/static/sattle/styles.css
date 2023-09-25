@@ -246,3 +246,98 @@ skip-button[disabled] {
 #name-message-modal button[type="submit"]:hover {
     background-color: #0056b3;
 }
+/* Mobile-specific styles */
+
+@media (max-width: 1px) {
+    /* Container */
+    .container {
+        grid-template-columns: 1fr;
+        padding: 10px;
+        grid-template-areas:
+            "title title title"
+            "feedback image record"
+            "form form form"
+            "score tries-skips tries-skips";
+    }
+
+    h1 {
+        grid-area: title;
+        margin: 0;
+        padding: 10px 0;
+    }
+
+    /* Satellite Image */
+    .satellite-image {
+        grid-area: image;
+        max-width: 100%;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    /* Feedback and Record Score Buttons */
+    #feedback-btn, 
+    .record-score-btn {
+        position: absolute;
+        top: 50%;
+        z-index: 10;
+        padding: 4px 8px; /* Making them smaller */
+        font-size: 12px; /* Making font size smaller */
+        transform: translateY(-50%);
+    }
+
+    #feedback-btn {
+        grid-area: feedback;
+        left: 5px;
+    }
+
+    .record-score-btn {
+        grid-area: record;
+        right: 5px;
+    }
+
+    /* Submit Guess Field and Form */
+    form {
+        grid-area: form;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    input[type="text"], 
+    button[type="submit"] {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        margin: 5px 0;
+    }
+
+    input[type="text"] {
+        width: calc(100% - 10px); /* Adjusting width to match the submit button */
+    }
+
+    /* Score and Tries Containers */
+    .score-container {
+        grid-area: score;
+        margin-right: 10px; /* Adding some margin for spacing */
+    }
+
+    .tries-skips-container {
+        grid-area: tries-skips;
+    }
+
+    /* Adjusting other elements for better mobile view */
+    h1 {
+        font-size: 20px;
+    }
+
+    button, 
+    input[type="submit"], 
+    textarea {
+        padding: 12px;
+    }
+
+    #record-score, 
+    #feedback-btn {
+        display: block;
+        margin: 10px 0;
+    }
+}
