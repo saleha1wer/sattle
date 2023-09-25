@@ -57,8 +57,7 @@ h1 {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
-skip-button[disabled], 
-form {
+skip-button[disabled] {
     background-color: #ccc;
     cursor: not-allowed;
     margin-top: 20px;
@@ -200,4 +199,50 @@ form {
 
 #global-high-scores-modal {
     padding: 20px;
+}
+
+#name-message-modal {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#name-message-modal label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+#name-message-modal input[type="text"],
+#name-message-modal textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+#name-message-modal input[type="text"]:focus,
+#name-message-modal textarea:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+#name-message-modal button[type="submit"] {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#name-message-modal button[type="submit"]:hover {
+    background-color: #0056b3;
 }
