@@ -248,7 +248,7 @@ skip-button[disabled] {
 }
 /* Mobile-specific styles */
 
-@media (max-width: 768px) {
+@media (max-width: 1px) {
     /* Container */
     .container {
         grid-template-columns: 1fr;
