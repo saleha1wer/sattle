@@ -247,37 +247,72 @@ skip-button[disabled] {
     background-color: #0056b3;
 }
 /* Mobile-specific styles */
-@media (max-width: 830px) { /* This will target devices with a width of up to 768px, which covers most phones in portrait mode */
+
+@media (max-width: 768px) {
+    /* Container */
     .container {
-        grid-template-columns: 1fr; /* Stack everything vertically */
+        grid-template-columns: 1fr;
         padding: 10px;
     }
 
-    .main-content, 
+    /* Satellite Image */
+    .satellite-image {
+        max-width: 100%;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    /* Feedback and Record Score Buttons */
+    #feedback-btn, 
+    .record-score-btn {
+        position: absolute;
+        top: 10px;
+        z-index: 10;
+        transform: translateY(-50%);
+    }
+
+    #feedback-btn {
+        left: 10px;
+    }
+
+    .record-score-btn {
+        right: 10px;
+    }
+
+    /* Submit Guess Field and Form */
+    form {
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    input[type="text"], 
+    button[type="submit"] {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        margin: 5px 0;
+    }
+
+    /* Score and Tries Containers */
     .score-container, 
     .tries-skips-container {
-        margin-bottom: 20px;
+        margin-top: 20px;
     }
 
+    /* Adjusting other elements for better mobile view */
     h1 {
-        font-size: 20px; /* Slightly smaller heading */
+        font-size: 20px;
     }
 
-    .satellite-image {
-        max-width: 100%; /* Ensure images don't overflow the viewport */
-        max-height: 50vh;
-    }
-
-    button, input[type="submit"], input[type="text"], textarea {
-        width: 100%; /* Make form elements full width */
-        padding: 12px; /* Increase padding for better touch */
+    button, 
+    input[type="submit"], 
+    textarea {
+        padding: 12px;
     }
 
     #record-score, 
-    .record-score-btn, 
     #feedback-btn {
-        position: static; /* Reset positioning */
-        display: block; /* Make them block elements */
-        margin: 10px 0; /* Add some margin */
+        display: block;
+        margin: 10px 0;
     }
 }
