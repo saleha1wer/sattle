@@ -277,12 +277,12 @@ skip-button[disabled] {
     }
 
     .score-container {
-        bottom: -110px; /* Adjusted position */
+        bottom: -55px; /* Adjusted position */
         left: 5%; /* Adjusted to give more space */
     }
 
     .tries-skips-container {
-        bottom: -110px; /* Adjusted position */
+        bottom: -55px; /* Adjusted position */
         right: 5%; /* Adjusted to give more space */
         flex-direction: row;
         justify-content: space-between;
@@ -303,7 +303,6 @@ skip-button[disabled] {
         gap: 10px;
         clear: both;
     }
-
     #your-form-id label {
         display: block;
         margin-bottom: 5px;
@@ -334,6 +333,25 @@ skip-button[disabled] {
 
     #your-form-id button[type="submit"]:hover {
         background-color: #0056b3; /* Darker shade on hover */
+    }
+    #feedback-btn, 
+    .record-score-btn {
+        font-size: 14px; /* Decrease font size for mobile */
+        padding: 8px 16px; /* Adjust padding for mobile */
+    }
+
+    .buttons-container {
+        justify-content: space-between; /* This will push the buttons to the left and right */
+        flex-direction: row; /* Change direction to row */
+        width: 100%; /* Take up full width */
+    }
+
+    #feedback-btn {
+        margin-right: auto; /* Pushes the button to the left */
+    }
+
+    .record-score-btn {
+        margin-left: auto; /* Pushes the button to the right */
     }
 }
 
