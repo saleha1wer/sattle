@@ -287,7 +287,10 @@ skip-button[disabled] {
         flex-direction: row;
         justify-content: space-between;
     }
-
+    .tries-container .incorrect-feedback {
+        font-size: 1em; /* Adjust this value to your preference */
+        margin-right: 5px; /* Adjust spacing between X's if needed */
+    }
     .skips-container, .tries-container {
         flex: 1; /* This ensures both containers take up equal space within the parent */
         max-width: 50%; /* Ensuring neither grows beyond half the parent's width */
