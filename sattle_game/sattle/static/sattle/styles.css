@@ -39,14 +39,16 @@ body {
 }
 
 .main-content {
-    padding: 40px;
+    padding: 20px 40px 40px 40px; /* Reduced the top padding */
     text-align: center;
 }
 
 h1 {
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 20px;
+    color: #2a2a2a; /* Darker shade for better contrast */
+    font-size: 26px; /* Slightly increased font size */
+    font-weight: bold; /* Bold font weight */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle text shadow */
+    margin-bottom: 15px; /* Reduced margin-bottom to move it up */
 }
 
 .satellite-image {
@@ -80,15 +82,9 @@ skip-button[disabled] {
     color: red;
 }
 
-.image-feedback-container {
-    position: relative;
-}
-
-#record-score, 
-.record-score-btn, 
-#feedback-btn {
-    position: absolute;
-    top: -40px;
+#feedback-btn, 
+.record-score-btn {
+    font-size: 16px;
     margin: 0;
     padding: 10px 20px;
     border: none;
@@ -98,7 +94,6 @@ skip-button[disabled] {
 }
 
 .record-score-btn {
-    right: 0;
     background-color: #7faeff;
     color: #fff;
 }
@@ -108,18 +103,12 @@ skip-button[disabled] {
 }
 
 #feedback-btn {
-    left: 0;
     background-color: #ff7f7f;
     color: #fff;
 }
 
 #feedback-btn:hover {
     background-color: #ff5f5f;
-}
-
-#feedback-btn, 
-.record-score-btn {
-    font-size: 16px;
 }
 
 #feedback-modal, 
@@ -191,12 +180,6 @@ skip-button[disabled] {
     word-wrap: break-word;
 }
 
-@media (max-width: 600px) {
-    #global-high-scores-modal {
-        overflow-x: auto;
-    }
-}
-
 #global-high-scores-modal {
     padding: 20px;
 }
@@ -246,98 +229,108 @@ skip-button[disabled] {
 #name-message-modal button[type="submit"]:hover {
     background-color: #0056b3;
 }
-/* Mobile-specific styles */
 
-@media (max-width: 1px) {
-    /* Container */
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    #global-high-scores-modal {
+        overflow-x: auto;
+    }
+
     .container {
-        grid-template-columns: 1fr;
-        padding: 10px;
-        grid-template-areas:
-            "title title title"
-            "feedback image record"
-            "form form form"
-            "score tries-skips tries-skips";
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+        justify-content: flex-start; /* Aligns content to the top */
+    }
+
+    .main-content {
+        padding: 5px; 
+        padding-bottom: 20px; 
+        position: relative; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        width: 100%; 
     }
 
     h1 {
-        grid-area: title;
-        margin: 0;
-        padding: 10px 0;
+        margin-top: 5px; /* Reduced space above the title */
+        margin-bottom: 10px; 
     }
 
-    /* Satellite Image */
     .satellite-image {
-        grid-area: image;
         max-width: 100%;
-        margin: 0 auto;
-        position: relative;
+        max-height: 40vh; /* Set a maximum height relative to the viewport */
+        margin-bottom: 10px; /* Reduced space below the image */
     }
 
-    /* Feedback and Record Score Buttons */
-    #feedback-btn, 
-    .record-score-btn {
+    .score-container, .tries-skips-container {
+        width: 35%; /* Same width for both containers */
         position: absolute;
-        top: 50%;
-        z-index: 10;
-        padding: 4px 8px; /* Making them smaller */
-        font-size: 12px; /* Making font size smaller */
-        transform: translateY(-50%);
+        margin-top: 10px;
+        height: 90px;
     }
 
-    #feedback-btn {
-        grid-area: feedback;
-        left: 5px;
-    }
-
-    .record-score-btn {
-        grid-area: record;
-        right: 5px;
-    }
-
-    /* Submit Guess Field and Form */
-    form {
-        grid-area: form;
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    input[type="text"], 
-    button[type="submit"] {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        margin: 5px 0;
-    }
-
-    input[type="text"] {
-        width: calc(100% - 10px); /* Adjusting width to match the submit button */
-    }
-
-    /* Score and Tries Containers */
     .score-container {
-        grid-area: score;
-        margin-right: 10px; /* Adding some margin for spacing */
+        bottom: -110px; /* Adjusted position */
+        left: 5%; /* Adjusted to give more space */
     }
 
     .tries-skips-container {
-        grid-area: tries-skips;
+        bottom: -110px; /* Adjusted position */
+        right: 5%; /* Adjusted to give more space */
+        flex-direction: row;
+        justify-content: space-between;
     }
 
-    /* Adjusting other elements for better mobile view */
-    h1 {
-        font-size: 20px;
+    .skips-container, .tries-container {
+        flex: 1; /* This ensures both containers take up equal space within the parent */
+        max-width: 50%; /* Ensuring neither grows beyond half the parent's width */
+        padding: 0 10px; /* Adding some padding for spacing */
     }
 
-    button, 
-    input[type="submit"], 
-    textarea {
-        padding: 12px;
+    .buttons-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        clear: both;
     }
 
-    #record-score, 
-    #feedback-btn {
+    #your-form-id label {
         display: block;
-        margin: 10px 0;
+        margin-bottom: 5px;
+    }
+
+    #your-form-id input[type="text"] {
+        font-size: 18px; /* Increase font size */
+        padding: 10px 15px; /* Increase padding for better touch */
+        width: 100%; /* Full width */
+        box-sizing: border-box; /* To ensure padding and border are included in width */
+        margin-bottom: 10px; /* Space between the field and the button */
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    #your-form-id button[type="submit"] {
+        font-size: 18px; /* Increase font size */
+        padding: 10px 15px; /* Increase padding for better touch */
+        width: 100%; /* Full width */
+        box-sizing: border-box; /* To ensure padding and border are included in width */
+        cursor: pointer; /* Indicates clickable */
+        border: none; /* Remove default border */
+        background-color: #007BFF; /* Example color */
+        color: #fff; /* Text color */
+        border-radius: 5px; /* Rounded corners */
+        transition: background-color 0.3s ease; /* Smooth color transition */
+    }
+
+    #your-form-id button[type="submit"]:hover {
+        background-color: #0056b3; /* Darker shade on hover */
     }
 }
+

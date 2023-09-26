@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {% comment %} <meta name="viewport" content="width=device-width, initial-scale=1.0"> {% endcomment %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sattle Game</title>
     <link rel="stylesheet" href="{% static 'sattle/styles.css' %}">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
@@ -18,9 +18,11 @@
         </div>
         <div class="main-content">
             <h1>SatGuess</h1>
-            <div class="image-feedback-container">
-                <p id="record-score" class="record-score-btn">GOAT High Score: <span id="global-high-score">{{ global_high_score }}</span></p>
+            <div class="buttons-container">
                 <button id="feedback-btn" class="feedback-btn">Give Feedback</button>
+                <p id="record-score" class="record-score-btn">GOAT High Score: <span id="global-high-score">{{ global_high_score }}</span></p>
+            </div>
+            <div class="image-feedback-container">
                 <img src="{{ image.image.url }}" alt="Satellite Image" class="satellite-image">
             </div>
             <div id="congrats-modal" title="Congratulations!" style="display:none;">
@@ -121,10 +123,6 @@
                 autoOpen: false,
                 modal: true
             });
-            {% comment %} $("#global-high-scores-modal").dialog({
-                autoOpen: false,
-                modal: true
-            }); {% endcomment %}
             $("#congrats-modal").dialog({
                 autoOpen: false,
                 modal: true,
