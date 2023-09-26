@@ -353,5 +353,9 @@ skip-button[disabled] {
     .record-score-btn {
         margin-left: auto; /* Pushes the button to the right */
     }
+    #distance-message {
+        position: relative; /* Set position to relative (or absolute/fixed/sticky as per your requirement) */
+        z-index: 1000; /* High z-index value to ensure it's on top */
+    }
 }
 
