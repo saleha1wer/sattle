@@ -355,7 +355,7 @@ skip-button[disabled] {
     }
     #distance-message {
         position: relative; /* Set position to relative (or absolute/fixed/sticky as per your requirement) */
-        z-index: 1000; /* High z-index value to ensure it's on top */
+        z-index: 1000000; /* High z-index value to ensure it's on top */
     }
 }
 
