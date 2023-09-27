@@ -17,7 +17,8 @@
             <span class="correct-feedback">Correct!</span>
         </div>
         <div class="main-content">
-            <h1>SatGuess</h1>
+            <img src="{% static 'sattle/logo.png' %}" alt="SatGuess Logo" class="logo">
+            <div class="divider"></div>
             <div class="buttons-container">
                 <button id="feedback-btn" class="feedback-btn">Give Feedback</button>
                 <p id="record-score" class="record-score-btn">GOAT High Score: <span id="global-high-score">{{ global_high_score }}</span></p>

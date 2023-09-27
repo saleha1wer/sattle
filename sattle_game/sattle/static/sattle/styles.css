@@ -235,8 +235,21 @@ skip-button[disabled] {
     justify-content: space-between;
     margin-bottom: 20px;
 }
-
-@media (max-width: 600px) {
+.logo {
+    max-width: 50%; /* Ensures the logo doesn't overflow its container */
+    height: auto; /* Maintains the aspect ratio */
+    display: block; /* Makes the image a block element */
+    margin: 0 auto; /* Centers the logo if it's smaller than its container */
+    margin-bottom: 15px; /* Space below the logo */
+}
+.divider {
+    width: 80%; /* Adjust width as needed */
+    height: 1px; /* Thin line */
+    background: linear-gradient(to right, transparent, #ccc, transparent);
+    margin: 20px auto; /* Vertical spacing and centering */
+    opacity: 0.7; /* Slight transparency for a softer look */
+}
+@media (max-width: 768px) {
     #global-high-scores-modal {
         overflow-x: auto;
     }
@@ -300,7 +313,6 @@ skip-button[disabled] {
     .buttons-container {
         flex-direction: column;
         align-items: center;
-        gap: 10px;
         clear: both;
     }
     #your-form-id label {
@@ -360,6 +372,15 @@ skip-button[disabled] {
     .inline-arrow {
         position: relative; /* Set position to relative (or absolute/fixed/sticky as per your requirement) */
         z-index: 1000; /* High z-index value to ensure it's on top */
+    }
+    .divider {
+        width: 90%; /* Adjust width for smaller screens */
+    }
+    .logo {
+        max-width: 50%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
     }
     
 }
