@@ -297,12 +297,12 @@ skip-button[disabled] {
     }
 
     .score-container {
-        bottom: -60px; /* Adjusted position */
+        bottom: -90px; /* Adjusted position */
         left: 5%; /* Adjusted to give more space */
     }
 
     .tries-skips-container {
-        bottom: -60px; /* Adjusted position */
+        bottom: -90px; /* Adjusted position */
         right: 5%; /* Adjusted to give more space */
         flex-direction: row;
         justify-content: space-between;
