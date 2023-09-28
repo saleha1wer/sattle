@@ -43,6 +43,7 @@
                     <th>User ID</th>
                     <th>Guesses Made</th>
                     <th>Correct Guesses</th>
+                    <th>Highest Score</th>
                 </tr>
             </thead>
             <tbody>
@@ -51,6 +52,7 @@
                         <td>{{ user.user_identifier }}</td>
                         <td>{{ user.total_guesses }}</td>
                         <td>{{ user.correct_guesses }}</td>
+                        <td>{{ user.highest_score|default:"N/A" }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

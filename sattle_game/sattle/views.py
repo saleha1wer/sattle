@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import SatelliteImage, Guess, WebsiteStats,Feedback, UserScore, GlobalHighScore
 from django.shortcuts import get_object_or_404
-from django.db.models import Count, Q, Max,Avg
+from django.db.models import Count, Q, Max,Avg, OuterRef, Subquery
 from datetime import datetime, timedelta
 import random
 import math
@@ -223,9 +223,11 @@ def view_guesses(request):
     total_correct_guesses_24h = Guess.objects.filter(timestamp__gte=last_24_hours, correct=True).count()
 
     user_stats = Guess.objects.values('user_identifier').annotate(
-        total_guesses=Count('id'),
-        correct_guesses=Count('id', filter=Q(correct=True))
-    ).exclude(user_identifier="a2280f7e-e41b-466b-a0e3-3bfa754fd986").order_by('-total_guesses') # Exclude data for the specific user
+    total_guesses=Count('id'),
+    correct_guesses=Count('id', filter=Q(correct=True)),
+    highest_score=Subquery(
+        UserScore.objects.filter(user_identifier=OuterRef('user_identifier')).values('high_score')[:1]
+    )).exclude(user_identifier="a2280f7e-e41b-466b-a0e3-3bfa754fd986").order_by('-total_guesses')
 
     # Calculate average and median guesses
     avg_guesses = Guess.objects.values('user_identifier').annotate(
