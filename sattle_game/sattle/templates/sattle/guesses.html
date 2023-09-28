@@ -5,7 +5,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h2>Recent 50 Guesses:</h2>
+    <h2>Recent 25 Guesses:</h2>
     <table border="1">
         <thead>
             <tr>
@@ -20,7 +20,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for guess in guesses|slice:"-50" %}
+            {% for guess in guesses|slice:"-25" %}
                 <tr>
                     <td>{{ guess.image_id }}</td>
                     <td>{{ guess.guessed_country }}</td>
@@ -64,8 +64,10 @@
 
     <h2>Stats:</h2>
     <p>Total guesses: {{ stats.total_guesses }} (Last 24 hours: {{ total_guesses_24h }})</p>
-    <p>Total unique users: {{ user_stats|length }}</p>
     <p>Total correct guesses: {{ stats.total_correct_guesses }} (Last 24 hours: {{ total_correct_guesses_24h }})</p>
+    <p>Total unique users: {{ user_stats|length }}</p>
+    <p>Average number of guesses per user: {{ avg_guesses }}</p>
+    <p>Median number of guesses per user: {{ median_guesses }}</p>
     <p>Total sessions started: {{ stats.total_sessions }}</p>
 
     <script>
