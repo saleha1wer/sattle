@@ -211,8 +211,8 @@ def submit_feedback(request):
 
 @staff_member_required
 def view_guesses(request):
-    # Fetch only the last 100 guesses
-    all_guesses = Guess.objects.all().order_by('-timestamp')[:100]
+    # Fetch only the last 50 guesses
+    all_guesses = Guess.objects.all().order_by('-timestamp')[:50]
     
     stats = WebsiteStats.objects.get(pk=1)
 
