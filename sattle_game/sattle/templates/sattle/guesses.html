@@ -2,60 +2,55 @@
 <html>
 <head>
     <title>Guesses</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Image ID</th>
-                <th>Guessed Country</th>
-                <th>Correct Country</th>
-                <th>Distance</th>
-                <th>Direction</th>
-                <th>Correct?</th>
-                <th>Time Stamp</th>
-                <th>User ID</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for guess in guesses %}
-            <tr>
-                <td>{{ guess.image_id }}</td>
-                <td>{{ guess.guessed_country }}</td>
-                <td>{{ guess.correct_country }}</td>
-                <td>{{ guess.distance }}</td>
-                <td>{{ guess.direction }}</td>
-                <td>{{ guess.correct }}</td>
-                <td>{{ guess.timestamp }}</td>
-                <td>{{ guess.user_identifier }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+    <!-- ... Guess table ... -->
+    <tbody>
+        {% for guess in guesses|slice:"-100" %}
+            <!-- ... guess rows ... -->
+        {% endfor %}
+    </tbody>
     </table>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>User ID</th>
-                <th>Guesses Made</th>
-                <th>Correct Guesses</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in user_stats %}
-            <tr>
-                <td>{{ user.user_identifier }}</td>
-                <td>{{ user.total_guesses }}</td>
-                <td>{{ user.correct_guesses }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div style="display: flex; justify-content: space-between;">
+        <!-- User table -->
+        <table border="1" style="width: 48%;">
+            <!-- ... user stats table ... -->
+        </table>
+
+        <!-- Graph Distribution -->
+        <canvas id="myChart" style="width: 48%; height: 400px;"></canvas>
+    </div>
 
     <h2>Stats:</h2>
     <p>Total guesses: {{ stats.total_guesses }} (Last 24 hours: {{ total_guesses_24h }})</p>
+    <p>Total unique users: {{ user_stats|length }}</p>
     <p>Total correct guesses: {{ stats.total_correct_guesses }} (Last 24 hours: {{ total_correct_guesses_24h }})</p>
     <p>Total sessions started: {{ stats.total_sessions }}</p>
-    ...
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ labels|safe }},
+                datasets: [{
+                    label: 'Number of Users',
+                    data: {{ data|safe }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
