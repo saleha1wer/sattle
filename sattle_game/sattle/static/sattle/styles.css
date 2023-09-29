@@ -80,6 +80,7 @@ skip-button[disabled] {
 
 .incorrect-feedback {
     color: red;
+    display: none;
 }
 
 #feedback-btn, 
@@ -198,7 +199,11 @@ skip-button[disabled] {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+    flex-direction: row; /* Ensure they are in a row */
+    justify-content: space-between; /* Space them out */
+    align-items: center; /* Align vertically */
 }
+
 .logo {
     max-width: 50%; /* Ensures the logo doesn't overflow its container */
     height: auto; /* Maintains the aspect ratio */
@@ -251,7 +256,78 @@ skip-button[disabled] {
     width: 100%; /* Full width */
     table-layout: fixed; /* Fixed layout for performance */
 }
+.restart-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 5px;
+    margin: 10px 0;
+}
 
+.restart-btn:hover {
+    background-color: darkred;
+}
+#feedback-btn, .record-score-btn, .restart-btn {
+    box-sizing: border-box;  /* Ensure padding and border are included in total height */
+    height: 40px;            /* Explicitly set a height */
+}
+.restart-message {
+    padding: 20px;
+    background: linear-gradient(135deg, #fdfdfd, #f9f9f9);  /* Subtle gradient for elegance */
+    border: 2px solid #d43f00;                             /* Border for emphasis */
+    border-radius: 8px;                                    /* Rounded corners */
+    font-size: 1.3em;                                      /* Slightly larger font size for prominence */
+    text-align: center;                                    /* Centered text */
+    color: #d43f00;                                        /* Red color for emphasis */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);             /* Soft shadow for depth */
+    margin: 20px 0;                                        /* Space it out from other elements */
+    font-weight: 500;                                      /* Semi-bold font weight for emphasis */
+}
+
+.restart-container {
+    background-color: #fff;            /* White background for contrast */
+    padding: 30px;                     /* Increased padding for spaciousness */
+    border-radius: 10px;               /* Slightly larger rounded corners */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);  /* Slightly more pronounced shadow for depth */
+    text-align: center;                /* Centered content */
+    margin-top: 20px;                  /* Space from the top */
+    border: 1px solid rgba(0, 0, 0, 0.1);  /* Subtle border for more depth */
+}
+
+.guess-history {
+    padding: 20px;
+    border: 2px solid #efefef;
+    border-radius: 10px; /* Added border-radius for rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
+    max-height: 150px;
+    overflow-y: auto; /* Changed scroll to auto so the scrollbar only appears when needed */
+    background-color: #fafafa; /* Light grey background for contrast */
+}
+
+.guess-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px; /* Padding for individual entries */
+    background-color: white; /* Solid white background */
+    border-radius: 5px; /* Rounded corners for each entry */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* A subtle shadow for depth */
+    margin-bottom: 10px; /* Increased margin for better spacing */
+    transition: background-color 0.3s; /* Transition effect for hover */
+}
+
+/* Add a hover effect to guess entries */
+.guess-entry:hover {
+    background-color: #f5f5f5; /* Light grey on hover */
+}
+
+.buttons-container button,
+.buttons-container p.record-score-btn {
+    font-size: 16px;
+}
 @media (max-width: 768px) {
     #high-scores-table th, #high-scores-table td {
         padding: 8px; /* Slightly reduce padding for smaller screens */
@@ -297,12 +373,12 @@ skip-button[disabled] {
     }
 
     .score-container {
-        bottom: -90px; /* Adjusted position */
+        bottom: -190px; /* Adjusted position */
         left: 5%; /* Adjusted to give more space */
     }
 
     .tries-skips-container {
-        bottom: -90px; /* Adjusted position */
+        bottom: -190px; /* Adjusted position */
         right: 5%; /* Adjusted to give more space */
         flex-direction: row;
         justify-content: space-between;
@@ -321,6 +397,18 @@ skip-button[disabled] {
         flex-direction: column;
         align-items: center;
         clear: both;
+        justify-content: space-between; /* This will push the buttons to the left and right */
+        flex-direction: row; /* Change direction to row */
+        width: 100%; /* Take up full width */
+    }
+    .buttons-container button,
+    .buttons-container p.record-score-btn {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center; /* ensures text inside the element is centered */
+        height: 40px;
     }
     #your-form-id label {
         display: block;
@@ -359,12 +447,6 @@ skip-button[disabled] {
         padding: 8px 16px; /* Adjust padding for mobile */
     }
 
-    .buttons-container {
-        justify-content: space-between; /* This will push the buttons to the left and right */
-        flex-direction: row; /* Change direction to row */
-        width: 100%; /* Take up full width */
-    }
-
     #feedback-btn {
         margin-right: auto; /* Pushes the button to the left */
     }
@@ -389,6 +471,35 @@ skip-button[disabled] {
         display: block;
         margin: 0 auto;
     }
-    
+
+    .guess-history {
+        width: calc(100% - 30px);
+        padding: 20px 15px; /* Add 15px horizontal padding to match the input/button */
+        margin: 0 auto; /* Centering the element if it doesn't span the entire width */
+        max-height: 200px;
+    }
+    /* Style guess-entry */
+    .guess-entry {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 14px;
+        background-color: white;
+        border-radius: 7px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        margin-bottom: 12px;
+        transition: background-color 0.3s;
+
+        /* This will make sure text doesn't break too early and utilize the available space */
+        flex-wrap: nowrap;
+    }
+
+    /* Adjust the country span to occupy more width and push other items to the right */
+    .guess-entry span:first-child {
+        flex: 1 0 auto;
+        white-space: nowrap; /* Prevent the text from breaking onto multiple lines */
+        overflow: hidden;   /* Hide the excess text */
+        text-overflow: ellipsis; /* Display '...' for the overflowed content */
+    }
 }
 

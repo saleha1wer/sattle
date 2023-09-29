@@ -22,7 +22,8 @@ def reset_score(request):
     request.session['beat_global_high_score'] = False
     request.session['beat_user_high_score'] = False
     request.session['prompt_for_name_message'] = False
-
+    user_identifier = request.COOKIES.get('user_identifier')
+    del request.session[f'game_state_{user_identifier}']
     return JsonResponse({"message": "Score reset successfully", "score": 0})
 
 def calculate_direction(lat1, lon1, lat2, lon2):
@@ -66,45 +67,88 @@ def calculate_distance(image, guessed_country):
     direction = calculate_direction(lat2, lon2,lat1, lon1)
     return distance, correct, direction
     
+def restart(request):
+    reset_score(request)
+    return home(request)
+
+
 def home(request):
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    user_identifier = request.COOKIES.get('user_identifier')
+    # AJAX Request Check
+    restart_action = True if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.POST.get('action') != 'skip' else False
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.POST.get('action') == 'skip':
+        print(request.session[f'game_state_{user_identifier}'])
         random_image = random.choice(SatelliteImage.objects.all())
         old_correct_answer = request.session.get('correct_answer')
         request.session['correct_answer'] = random_image.country
+        # Fetch or Initialize Game State
+        request.session[f'game_state_{user_identifier}']['skips'] -= 1
+        request.session[f'game_state_{user_identifier}']['tries'] = 3
+        request.session[f'game_state_{user_identifier}']['image_url'] = random_image.image.url
+        request.session[f'game_state_{user_identifier}']['image_id'] = random_image.id
+        request.session[f'game_state_{user_identifier}']['correct_answer'] = random_image.country
         return JsonResponse({
             "new_image_url": random_image.image.url,
             "new_image_id": random_image.id,
-            "old_correct_answer": old_correct_answer
+            "old_correct_answer": old_correct_answer,
+            'game_state': request.session[f'game_state_{user_identifier}']
         })
-    user_identifier = request.COOKIES.get('user_identifier')
-    user_score = UserScore.objects.filter(user_identifier=user_identifier).first()
-    user_high_score = user_score.high_score if user_score else 0
+    else:
+        user_score = UserScore.objects.filter(user_identifier=user_identifier).first()
+        user_high_score = user_score.high_score if user_score else 0
+        global_high_score = UserScore.objects.aggregate(Max('high_score'))['high_score__max'] or 0
+        request.session['beat_global_high_score'] = request.session.get('beat_global_high_score', False)
+        request.session['beat_user_high_score'] = request.session.get('beat_user_high_score', False)
+        request.session['prompt_for_name_message'] = request.session.get('prompt_for_name_message', False)
+        if restart_action:
+            random_image = random.choice(SatelliteImage.objects.all())
+            game_state = {
+                'tries': 3,
+                'skips': 3,
+                'score': 0,
+                'image_url': random_image.image.url,
+                'image_id': random_image.id,
+                'correct_answer': random_image.country
+            }
+            response = JsonResponse(game_state)
+        else:
+            game_state_key = f'game_state_{user_identifier}'
+            game_state = request.session.get(game_state_key)
+            if not game_state or game_state.get('tries') == 0:
+                print('game state does not exist')
+                random_image = random.choice(SatelliteImage.objects.all())
+                game_state = {
+                    'tries': 3,
+                    'skips': 3,
+                    'score': 0,
+                    'image_url': random_image.image.url,
+                    'image_id': random_image.id,
+                    'correct_answer': random_image.country
+                }
+            else:
+                print('game state exists')
+                print(game_state)
+                random_image = SatelliteImage.objects.get(id=game_state['image_id'])
+            stats, created = WebsiteStats.objects.get_or_create(pk=1)
+            stats.total_sessions += 1
+            stats.save()
+            if not user_identifier:
+                user_identifier = str(uuid.uuid4())
+            context = {
+                'image_url': game_state['image_url'],
+                'image': random_image,
+                'countries': COUNTRY_CENTER_COORDS.keys(),
+                'user_high_score': user_high_score,
+                'global_high_score': global_high_score,
+                'game_state': game_state
+            }
+            response = render(request, 'sattle/home.html', context)
+            response.set_cookie('user_identifier', user_identifier, max_age=60*60*24*365)
 
-    global_high_score = UserScore.objects.aggregate(Max('high_score'))['high_score__max'] or 0
-
-    # Get a random satellite image for the game
-    request.session['score'] = 0
-    random_image = random.choice(SatelliteImage.objects.all())
-    context = {
-        'image_url': random_image,
-        'image': random_image,
-        'countries': COUNTRY_CENTER_COORDS.keys(),
-        'user_high_score': user_high_score,
-        'global_high_score': global_high_score
-    }
-    request.session['correct_answer'] = random_image.country
-    stats, created = WebsiteStats.objects.get_or_create(pk=1)
-    stats.total_sessions += 1
-    stats.save()
-    user_identifier = request.COOKIES.get('user_identifier')
-    if not user_identifier:
-        user_identifier = str(uuid.uuid4())
-    response = render(request, 'sattle/home.html', context)
-    response.set_cookie('user_identifier', user_identifier, max_age=60*60*24*365)
-    request.session['beat_global_high_score'] = False
-    request.session['beat_user_high_score'] = False
-    request.session['prompt_for_name_message'] = False
-
+    # Update Context and Session based on Game State
+    request.session['correct_answer'] = game_state['correct_answer']
+    request.session['score'] = game_state['score']
+    request.session[f'game_state_{user_identifier}'] = game_state
     return response
 
 def submit_guess(request):
@@ -130,12 +174,19 @@ def submit_guess(request):
         stats.total_guesses += 1
         request.session['correct_answer'] = image.country
         user_score, created = UserScore.objects.get_or_create(user_identifier=user_identifier)
+        game_state_key = f'game_state_{user_identifier}'
+        game_state = request.session.get(game_state_key)
         if correct:
             request.session['score'] = request.session.get('score', 0) + 1
             score = request.session.get('score')
             new_image = SatelliteImage.objects.order_by('?').first()
             stats.total_correct_guesses += 1
             stats.save()
+            game_state['score'] += 1
+            game_state['tries'] = 3
+            game_state['image_url'] = new_image.image.url
+            game_state['image_id'] = new_image.id
+            game_state['correct_answer'] = new_image.country
             beat_user_high_score, beat_global_high_score= False, False
             global_high_score = UserScore.objects.aggregate(Max('high_score'))['high_score__max'] or 0
             if score > user_score.high_score:
@@ -166,6 +217,7 @@ def submit_guess(request):
                 'prompt_for_name_message':request.session.get('prompt_for_name_message', False)
                 })
         else:
+            game_state['tries'] -= 1
             stats.save()
             score = request.session.get('score')
             response = JsonResponse({
@@ -185,6 +237,7 @@ def submit_guess(request):
         guess = Guess(image=image, guessed_country=guessed_country, distance=distance,user_identifier=user_identifier,correct=correct, direction=direction,correct_country=image.country)
         guess.save()
     # Redirect to home if request is not POST
+        request.session[f'game_state_{user_identifier}'] = game_state
     return response
 
 def save_global_high_score(request):

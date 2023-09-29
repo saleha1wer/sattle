@@ -21,6 +21,7 @@
             <div class="divider"></div>
             <div class="buttons-container">
                 <button id="feedback-btn" class="feedback-btn">Give Feedback</button>
+                <button id="restart-btn" class="restart-btn">Restart</button>   
                 <p id="record-score" class="record-score-btn">GOAT High Score: <span id="global-high-score">{{ global_high_score }}</span></p>
             </div>
             <div class="image-feedback-container">
@@ -37,7 +38,9 @@
                 <button type="submit">Submit</button>
             </form>
             <span id="country-error" style="color:red; display:none;">Please choose from the drop-down menu.</span>
-            <p id="distance-message"></p>
+            <div class="guess-history">
+                <!-- Guesses will be appended here -->
+            </div>
         </div>
         <div class="tries-skips-container">
             <div class="tries-container">
@@ -96,20 +99,17 @@
                     buttons: {
                         Restart: function() {
                             $(this).dialog("close");
-                            tries = 3;
-                            skips = 3;
-                            updateTries(tries);
-                            updateSkips(skips);
-                            // Reset the score
-                            $.get("{% url 'reset_score' %}", function() {
-                                updateScore(0);
-                            });
                             // Fetch a new random image when restarting
-                            $.get("{% url 'home' %}", function(data) {
-                                var newRandomImage = data.new_image_url;
-                                updateImage(newRandomImage);
-                                updateImageId(data.new_image_id);
+                            $.get("{% url 'restart' %}", function(data) {
+                                updateImage(data.image_url);
+                                updateImageId(data.image_id);
                                 $(".incorrect-feedback").hide(); 
+                                skips = data.skips
+                                tries = data.tries
+                                updateTries(tries);
+                                updateSkips(skips);
+                                updateScore(data.score);
+                                $guessHistory.empty();
                             });
                         }
                     },
@@ -133,12 +133,17 @@
                     }
                 }
             });
+            var isDataSubmitted = false;
             $("#name-message-form").submit(function(e) {
                 e.preventDefault();
-                
+            
                 // Get the CSRF token
                 var csrftoken = $(this).find("[name=csrfmiddlewaretoken]").val();
-                
+            
+                // Check if the name and message are blank and provide default values if they are
+                var nameValue = $("#name").val().trim() === "" ? "(noname)" : $("#name").val();
+                var messageValue = $("#message").val().trim() === "" ? "(nomessage)" : $("#message").val();
+            
                 // Disable the submit button to prevent multiple submissions
                 var submitButton = $(this).find("button[type='submit']");
                 submitButton.prop("disabled", true);
@@ -147,13 +152,14 @@
                     url: "{% url 'save_global_high_score' %}",
                     type: 'POST',
                     data: {
-                        name: $("#name").val(),
-                        message: $("#message").val(),
+                        name: nameValue,
+                        message: messageValue,
                         score: $("#score").text(),  // Assuming this is the user's score
                         csrfmiddlewaretoken: csrftoken  // Include the CSRF token
                     },
                     success: function(data) {
                         if (data.success) {
+                            isDataSubmitted = true;  // Mark data as submitted
                             $("#name-message-modal").dialog("close");
                             alert("Your score has been recorded!");
                         } else {
@@ -168,7 +174,72 @@
                         submitButton.prop("disabled", false);
                     }
                 });
-            });            
+            });      
+            $("#name-message-modal").on("dialogclose", function(event) {
+                if (!isDataSubmitted) {
+                    $.ajax({
+                        url: "{% url 'save_global_high_score' %}",
+                        type: 'POST',
+                        data: {
+                            name: "(noname)",
+                            message: "(nomessage)",
+                            score: $("#score").text(),
+                            csrfmiddlewaretoken: $(this).find("[name=csrfmiddlewaretoken]").val()
+                        },
+                        success: function(data) {
+                            if (data.success) {
+                                alert("Your score has been recorded with default values!");
+                            } else {
+                                alert("Error saving your score. Please try again.");
+                            }
+                            isDataSubmitted = false; // Reset flag here
+                        },
+                        error: function() {
+                            alert("Error saving your score. Please try again.");
+                            isDataSubmitted = false; // Reset flag here too
+                        }
+                    });
+                } else {
+                    // In case the dialog was closed after a manual submission
+                    isDataSubmitted = false;
+                }
+            });
+            $('.restart-btn').click(function() {
+                // Show confirmation dialog before restarting
+            
+                // Create the content structure using jQuery
+                var $dialogContent = $("<div title='Confirm Restart'></div>");
+                var $restartContainer = $("<div class='restart-container'></div>");
+                var $restartMessage = $("<p class='restart-message'>Are you sure you want to restart the game?</p>");
+                
+                $restartContainer.append($restartMessage);
+                $dialogContent.append($restartContainer);
+            
+                // Now use this structure for your dialog
+                $dialogContent.dialog({
+                    modal: true,
+                    buttons: {
+                        Yes: function() {
+                            $(this).dialog("close");
+                            // Fetch a new random image when restarting
+                            $.get("{% url 'restart' %}", function(data) {
+                                updateImage(data.image_url);
+                                updateImageId(data.image_id);
+                                $(".incorrect-feedback").hide(); 
+                                skips = data.skips
+                                tries = data.tries
+                                updateTries(tries);
+                                updateSkips(skips);
+                                updateScore(data.score);
+                            });
+                        },
+                        No: function() {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+            });                   
+                   
             $("#feedback-form").submit(function(e) {
                 e.preventDefault();
                 var submitButton = $(this).find("button[type='submit']");
@@ -239,8 +310,6 @@
                     alert("Error fetching high scores. Please try again later.");
                 });
             });
-            var skips = 3; // starting with 3 skips
-
             function updateSkips(skips) {
                 $('#skips-left').text(skips);
                 if (skips <= 0) {
@@ -251,7 +320,6 @@
                 }
             }
             var isRequestInProgress = false;
-
             $('#skip-button').click(function() {
                 if (isRequestInProgress) {
                     return; // Exit the function if a request is already in progress
@@ -259,31 +327,43 @@
             
                 if (skips > 0) {
                     isRequestInProgress = true; // Set the flag to true to indicate a request is in progress
-            
-                    skips--;
-                    updateSkips(skips);
-                    tries = 3; // reset tries when skipped
-                    updateTries(tries);
                     $(".incorrect-feedback").hide();
+                    
+                    // Get the CSRF token from the CSRF input field
+                    var csrfToken = $('[name=csrfmiddlewaretoken]').val();
             
                     // Fetch a new random image when skipping
-                    $.get("{% url 'home' %}", function(data) {
-                        $("<div title='Skipped'>The correct answer was: " + data.old_correct_answer + ".</div>").dialog({
-                            modal: true,
-                            buttons: {
-                                Okay: function() {
-                                    $(this).dialog("close");
+                    $.ajax({
+                        type: 'POST', 
+                        url: "{% url 'home' %}",
+                        data: {
+                            action: 'skip',
+                            csrfmiddlewaretoken: csrfToken  // Add CSRF token here
+                        },
+                        success: function(data) {
+                            $("<div title='Skipped'>The correct answer was: " + data.old_correct_answer + ".</div>").dialog({
+                                modal: true,
+                                buttons: {
+                                    Okay: function() {
+                                        $(this).dialog("close");
+                                    }
                                 }
+                            });
+                            var newRandomImage = data.new_image_url;
+                            var newImageId = data.new_image_id;
+                            updateImage(newRandomImage);
+                            updateImageId(newImageId);
+                            skips = data.game_state.skips
+                            tries = data.game_state.tries
+                            updateSkips(skips);
+                            updateTries(tries);
+                            $guessHistory.empty();
+                        },
+                        complete: function() {
+                            isRequestInProgress = false; // Reset the flag once the request has completed
+                            if (skips === 0) {
+                                $('#skip-button').prop('disabled', true); // Disable the button if tries are 0
                             }
-                        });
-                        var newRandomImage = data.new_image_url;
-                        var newImageId = data.new_image_id;
-                        updateImage(newRandomImage);
-                        updateImageId(newImageId);
-                    }).always(function() {
-                        isRequestInProgress = false; // Reset the flag once the request has completed
-                        if (tries === 0) {
-                            $('#skip-button').prop('disabled', true); // Disable the button if tries are 0
                         }
                     });
                 } else {
@@ -297,7 +377,7 @@
                 "{{ country }}"{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ];
-            var tries = 3; // starting with 3 tries
+            
             $("#guessed_country").on('keyup', function() {
                 $('#country-error').fadeOut();
             });
@@ -318,14 +398,73 @@
                 autoFocus: true
             });
             
-        
             function updateScore(score) {
                 $('#score').text(score);
             }
             function updateTries(tries) {
                 $('#tries-left').text(tries);
-            }            
-        
+                $(".incorrect-feedback").each(function(index) {
+                    if (index < 3 - tries) {
+                        $(this).fadeIn();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            } 
+            function displayGuessMessage(country, distance, angle) {
+                // Create the guess entry HTML structure using jQuery
+                var $entry = $("<div class='guess-entry'></div>");
+                var $country = $("<span></span>").text(country);
+                
+                // Start from 20000 km and count down to the actual distance
+                var $distance = $("<span></span>").attr('data-start', 20000).attr('data-end', distance).text("20000 km");
+                
+                var $arrow = $("<img>").attr('src', "{% static 'sattle/arrow_up.svg' %}")
+                                       .css('transform', 'rotate(' + angle + 'deg)')
+                                       .addClass("inline-arrow");
+                
+                $entry.append($country, $distance, $arrow);
+                $guessHistory.append($entry);
+                
+                // Animation for counting down from 20000 km to actual distance
+                $({ Counter: 20000 }).animate({ Counter: $distance.attr('data-end') }, {
+                    duration: 1000,
+                    easing: 'swing',
+                    step: function() {
+                        $distance.text(Math.ceil(this.Counter) + " km");
+                    }
+                });
+            }
+            function displayCorrectFeedback(country, angle) {
+                // Create the feedback entry HTML structure using jQuery
+                var $entry = $("<div class='guess-entry'></div>");
+                var $country = $("<span></span>").text(country);
+                var $distance = $("<span></span>").attr('data-end', 0).text("20000 km");
+                var $arrow = $("<img>").attr('src', "{% static 'sattle/arrow_up.svg' %}")
+                                       .css('transform', 'rotate(' + angle + 'deg)')
+                                       .addClass("inline-arrow");
+                
+                $entry.append($country, $distance, $arrow);
+                $guessHistory.append($entry);
+            
+                // Animation for counting down from 20000 km to 0
+                $({ Counter: 20000 }).animate({ Counter: $distance.attr('data-end') }, {
+                    duration: 1000,
+                    easing: 'swing',
+                    step: function() {
+                        $distance.text(Math.ceil(this.Counter) + " km");
+                    },
+                });
+            }
+            
+            var skips = {{ game_state.skips }}; 
+            var tries = {{ game_state.tries }};
+            var $guessHistory = $(".guess-history");
+            updateImage("{{ game_state.image_url }}");
+            updateImageId("{{ game_state.image_id }}");
+            updateScore("{{ game_state.score }}");
+            updateSkips(skips);
+            updateTries(tries);
             $(document).on('submit', '#your-form-id', function(e) {
                 e.preventDefault();
                 $("button[type='submit']").prop("disabled", true);
@@ -338,34 +477,38 @@
                 } else {
                     $('#country-error').fadeOut();
                 }
-                $('#distance-message').fadeOut();
                 var form = $(this);
                 $.post($(this).attr('action'), $(this).serialize(), function(data) {
                     $("#guessed_country").val('');
                     if (data.correct) {
-                        updateScore(data.score);
-                        $("#high-score").text(data.user_high_score);
-                        $("#global-high-score").text(data.global_high_score);
-                        if (data.beat_global_high_score) {
-                            $("#congrats-message").text("Bravo! You're now the reigning champion with the highest score on the site! After the end of this game, you will be prompted to enter leaderboard details.");
-                            $("#congrats-modal").dialog("open");
-                        } else if (data.beat_user_high_score) {
-                            $("#congrats-message").text("Congratulations! You've beaten your high score!");
-                            $("#congrats-modal").dialog("open");
-                        }        
-                        updateImage(data.new_image_url);
-                        updateImageId(data.new_image_id);
-                        tries = 3; // reset the tries if the answer is correct
-                        updateTries(tries);
-                        $(".correct-feedback").fadeIn().delay(2000).fadeOut(100);
-                        $(".incorrect-feedback").hide();
+                        displayCorrectFeedback(selectedCountry, data.angle);
+                        setTimeout(function() {
+                            $guessHistory.empty();
+                            updateScore(data.score);
+                            $("#high-score").text(data.user_high_score);
+                            $("#global-high-score").text(data.global_high_score);
+                            if (data.beat_global_high_score) {
+                                $("#congrats-message").text("Bravo! You're now the reigning champion with the highest score on the site! After the end of this game, you will be prompted to enter leaderboard details.");
+                                $("#congrats-modal").dialog("open");
+                            } else if (data.beat_user_high_score) {
+                                $("#congrats-message").text("Congratulations! You've beaten your high score!");
+                                $("#congrats-modal").dialog("open");
+                            }        
+                            updateImage(data.new_image_url);
+                            updateImageId(data.new_image_id);
+                            tries = 3; // reset the tries if the answer is correct
+                            updateTries(tries);
+                            $(".incorrect-feedback").hide();
+                            $(".correct-feedback").fadeIn().delay(2000).fadeOut(100);
+                        }, 1350);
+
+
                     } else {
                         tries -= 1;
                         updateTries(tries);
                         if (tries <= 0) {
                             // Show all Xs and set "tries left" to 0
                             $(".incorrect-feedback").show();
-                            updateTries(0);
                             let finalScore = data.score;
                             let correctAnswerMessage = data.correct_answer ? '<br>The correct country was: <span style="color:red;">' + data.correct_answer + '</span>. ' : '<br>';
                             if (data.prompt_for_name_message) {
@@ -382,11 +525,10 @@
                                 showRestartModal(data.score, data.correct_answer);
                             }
                         } else {
-                            let angle = data.angle;
+                            {% comment %} let angle = data.angle;
                             let arrowImage = `<img class="inline-arrow" style="transform: rotate(${angle}deg);" src="{% static 'sattle/arrow_up.svg' %}" alt="Direction Arrow">`;
-                            let message = `The distance from the center of ${selectedCountry} to the image coordinates is ${data.distance.toFixed(0)} km, direction: ${arrowImage}`;
-                            $('#distance-message').html(message).fadeIn();
-                            $(`.incorrect-feedback:nth-child(${4-tries})`).fadeIn();
+                            let message = `The distance from the center of ${selectedCountry} to the image coordinates is ${data.distance.toFixed(0)} km, direction: ${arrowImage}`; {% endcomment %}
+                            displayGuessMessage(selectedCountry, data.distance.toFixed(0), data.angle);
                         }
                     }
                     $("button[type='submit']").prop("disabled", false);
