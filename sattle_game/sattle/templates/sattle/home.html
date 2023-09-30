@@ -2,8 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sattle Game</title>
+    <link rel="icon" href="{% static 'sattle/satellite.png' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'sattle/styles.css' %}">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
@@ -11,18 +13,25 @@
 </head>
 <body>
     <div class="container">
-        <div class="score-container">
-            <p>High Score: <span id="high-score">{{ user_high_score }}</span></p>
-            <p>Score: <span id="score">0</span></p>
-            <span class="correct-feedback">Correct!</span>
-        </div>
         <div class="main-content">
-            <img src="{% static 'sattle/logo.png' %}" alt="SatGuess Logo" class="logo">
+            <div class="top-section">
+                <div class="left-section">
+                    <div class="score-container">
+                        <p>High Score: <span id="high-score">{{ user_high_score }}</span></p>
+                        <p>Score: <span id="score">0</span></p>
+                    </div>
+                    <button id="feedback-btn" class="feedback-btn">Give Feedback</button>
+                </div>
+                <img src="{% static 'sattle/logo.png' %}" alt="SatGuess Logo" class="logo">
+            </div>
             <div class="divider"></div>
             <div class="buttons-container">
-                <button id="feedback-btn" class="feedback-btn">Give Feedback</button>
                 <button id="restart-btn" class="restart-btn">Restart</button>   
                 <p id="record-score" class="record-score-btn">GOAT High Score: <span id="global-high-score">{{ global_high_score }}</span></p>
+                <div class="skips-container">
+                    <p class="skips-detail">Skips left: <span id="skips-left">3</span></p>
+                    <button id="skip-button" class="skip-button">Skip</button>
+                </div>
             </div>
             <div class="image-feedback-container">
                 <img src="{{ image.image.url }}" alt="Satellite Image" class="satellite-image">
@@ -32,28 +41,17 @@
             </div>
             <form method="POST" action="{% url 'submit_guess' %}" id="your-form-id">
                 {% csrf_token %}
-                <label for="guessed_country">Enter your guess:</label>
                 <input type="text" id="guessed_country" name="guessed_country_no_autofill" required autocomplete="off">        
                 <input type="hidden" name="image_id" id="image_id_input" value="{{ image.id }}">
-                <button type="submit">Submit</button>
+                <button type="submit">Guess</button>
             </form>
             <span id="country-error" style="color:red; display:none;">Please choose from the drop-down menu.</span>
             <div class="guess-history">
-                <!-- Guesses will be appended here -->
-            </div>
-        </div>
-        <div class="tries-skips-container">
-            <div class="tries-container">
-                <p>Tries left: <span id="tries-left">3</span></p>
-                <div class="incorrect-feedback-container"> <!-- Incorrect feedback within tries container -->
-                    <span class="incorrect-feedback">X</span>
-                    <span class="incorrect-feedback">X</span>
-                    <span class="incorrect-feedback">X</span>
-                </div>
-            </div>
-            <div class="skips-container">
-                <p>Skips left: <span id="skips-left">3</span></p>
-                <button id="skip-button" class="skip-button">Skip</button>
+                <div class="correct-feedback" style="display:none;"></div>
+                <div class="guess-entry placeholder-entry">GUESS #/#</div>
+                <div class="guess-entry placeholder-entry"></div>
+                <div class="guess-entry placeholder-entry"></div>
+                <div class="guess-entry placeholder-entry"></div>
             </div>
         </div>
         <div id="feedback-modal" title="Give Feedback" style="display:none;">
@@ -103,13 +101,11 @@
                             $.get("{% url 'restart' %}", function(data) {
                                 updateImage(data.image_url);
                                 updateImageId(data.image_id);
-                                $(".incorrect-feedback").hide(); 
                                 skips = data.skips
                                 tries = data.tries
-                                updateTries(tries);
                                 updateSkips(skips);
                                 updateScore(data.score);
-                                $guessHistory.empty();
+                                resetGuessHistory();
                             });
                         }
                     },
@@ -225,13 +221,11 @@
                             $.get("{% url 'restart' %}", function(data) {
                                 updateImage(data.image_url);
                                 updateImageId(data.image_id);
-                                $(".incorrect-feedback").hide(); 
                                 skips = data.skips
                                 tries = data.tries
-                                updateTries(tries);
                                 updateSkips(skips);
                                 updateScore(data.score);
-                                $guessHistory.empty();
+                                resetGuessHistory();
                             });
                         },
                         No: function() {
@@ -328,7 +322,6 @@
             
                 if (skips > 0) {
                     isRequestInProgress = true; // Set the flag to true to indicate a request is in progress
-                    $(".incorrect-feedback").hide();
                     
                     // Get the CSRF token from the CSRF input field
                     var csrfToken = $('[name=csrfmiddlewaretoken]').val();
@@ -357,8 +350,7 @@
                             skips = data.game_state.skips
                             tries = data.game_state.tries
                             updateSkips(skips);
-                            updateTries(tries);
-                            $guessHistory.empty();
+                            resetGuessHistory();
                         },
                         complete: function() {
                             isRequestInProgress = false; // Reset the flag once the request has completed
@@ -402,30 +394,38 @@
             function updateScore(score) {
                 $('#score').text(score);
             }
-            function updateTries(tries) {
-                $('#tries-left').text(tries);
-                $(".incorrect-feedback").each(function(index) {
-                    if (index < 3 - tries) {
-                        $(this).fadeIn();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            } 
+            function resetGuessHistory() {
+                var currentGuessNumber = (full_tries + 1) - tries;
+                var initialGuessHistory = `
+                    <div class="correct-feedback" style="display:none;"></div>
+                    <div class="guess-entry placeholder-entry">GUESS ${currentGuessNumber}/4</div>
+                    <div class="guess-entry placeholder-entry"></div>
+                    <div class="guess-entry placeholder-entry"></div>
+                    <div class="guess-entry placeholder-entry"></div>
+                `;
+                $('.guess-history').html(initialGuessHistory);
+            }      
+            function updatePlaceholders() {
+                var placeholders = $('.guess-history .placeholder-entry');
+                // Remove the latest (top) placeholder to insert a guess entry in its place
+                placeholders.first().remove();
+                
+                var currentGuessNumber = (full_tries + 1) - tries;
+                $(placeholders[1]).text("GUESS " + currentGuessNumber + "/4");
+            }
             function displayGuessMessage(country, distance, angle) {
                 // Create the guess entry HTML structure using jQuery
                 var $entry = $("<div class='guess-entry'></div>");
                 var $country = $("<span></span>").text(country);
-                
-                // Start from 20000 km and count down to the actual distance
                 var $distance = $("<span></span>").attr('data-start', 20000).attr('data-end', distance).text("20000 km");
-                
                 var $arrow = $("<img>").attr('src', "{% static 'sattle/arrow_up.svg' %}")
-                                       .css('transform', 'rotate(' + angle + 'deg)')
-                                       .addClass("inline-arrow");
+                                        .css('transform', 'rotate(' + angle + 'deg)')
+                                        .addClass("inline-arrow");
                 
                 $entry.append($country, $distance, $arrow);
-                $guessHistory.append($entry);
+            
+                // Add the new guess at the beginning
+                $('.guess-history').prepend($entry);
                 
                 // Animation for counting down from 20000 km to actual distance
                 $({ Counter: 20000 }).animate({ Counter: $distance.attr('data-end') }, {
@@ -435,37 +435,46 @@
                         $distance.text(Math.ceil(this.Counter) + " km");
                     }
                 });
+                
+                // Decrement the tries and call the updatePlaceholders function
+                updatePlaceholders();
             }
+            
             function displayCorrectFeedback(country, angle) {
                 // Create the feedback entry HTML structure using jQuery
                 var $entry = $("<div class='guess-entry'></div>");
                 var $country = $("<span></span>").text(country);
                 var $distance = $("<span></span>").attr('data-end', 0).text("20000 km");
                 var $arrow = $("<img>").attr('src', "{% static 'sattle/arrow_up.svg' %}")
-                                       .css('transform', 'rotate(' + angle + 'deg)')
-                                       .addClass("inline-arrow");
+                                        .css('transform', 'rotate(' + angle + 'deg)')
+                                        .addClass("inline-arrow");
                 
                 $entry.append($country, $distance, $arrow);
-                $guessHistory.append($entry);
             
+                // Add the new feedback at the beginning
+                $('.guess-history').prepend($entry);
+                
                 // Animation for counting down from 20000 km to 0
                 $({ Counter: 20000 }).animate({ Counter: $distance.attr('data-end') }, {
                     duration: 1000,
                     easing: 'swing',
                     step: function() {
                         $distance.text(Math.ceil(this.Counter) + " km");
-                    },
+                    }
                 });
+                
+                // Decrement the tries and call the updatePlaceholders function
+                updatePlaceholders();
             }
-            
             var skips = {{ game_state.skips }}; 
             var tries = {{ game_state.tries }};
+            var full_tries = 4
             var $guessHistory = $(".guess-history");
             updateImage("{{ game_state.image_url }}");
             updateImageId("{{ game_state.image_id }}");
             updateScore("{{ game_state.score }}");
             updateSkips(skips);
-            updateTries(tries);
+            resetGuessHistory()
             $(document).on('submit', '#your-form-id', function(e) {
                 e.preventDefault();
                 $("button[type='submit']").prop("disabled", true);
@@ -484,53 +493,48 @@
                     if (data.correct) {
                         displayCorrectFeedback(selectedCountry, data.angle);
                         setTimeout(function() {
-                            $guessHistory.empty();
-                            updateScore(data.score);
-                            $("#high-score").text(data.user_high_score);
-                            $("#global-high-score").text(data.global_high_score);
-                            if (data.beat_global_high_score) {
-                                $("#congrats-message").text("Bravo! You're now the reigning champion with the highest score on the site! After the end of this game, you will be prompted to enter leaderboard details.");
-                                $("#congrats-modal").dialog("open");
-                            } else if (data.beat_user_high_score) {
-                                $("#congrats-message").text("Congratulations! You've beaten your high score!");
-                                $("#congrats-modal").dialog("open");
-                            }        
-                            updateImage(data.new_image_url);
-                            updateImageId(data.new_image_id);
-                            tries = 3; // reset the tries if the answer is correct
-                            updateTries(tries);
-                            $(".incorrect-feedback").hide();
-                            $(".correct-feedback").fadeIn().delay(2000).fadeOut(100);
+                            $(".guess-history .correct-feedback").text("Correct!"); // Change the message if needed
+                            $(".guess-history .correct-feedback").fadeIn().delay(700).fadeOut(300);
+                            setTimeout(function(){
+                                resetGuessHistory();
+                                updateScore(data.score);
+                                $("#high-score").text(data.user_high_score);
+                                $("#global-high-score").text(data.global_high_score);
+                                if (data.beat_global_high_score) {
+                                    $("#congrats-message").text("Bravo! You're now the reigning champion with the highest score on the site! After the end of this game, you will be prompted to enter leaderboard details.");
+                                    $("#congrats-modal").dialog("open");
+                                } else if (data.beat_user_high_score) {
+                                    $("#congrats-message").text("Congratulations! You've beaten your high score!");
+                                    $("#congrats-modal").dialog("open");
+                                }        
+                                updateImage(data.new_image_url);
+                                updateImageId(data.new_image_id);
+                                tries = full_tries; // reset the tries if the answer is correct    
+                            },1000)
                         }, 1350);
-
-
                     } else {
                         tries -= 1;
-                        updateTries(tries);
-                        if (tries <= 0) {
-                            // Show all Xs and set "tries left" to 0
-                            $(".incorrect-feedback").show();
-                            let finalScore = data.score;
-                            let correctAnswerMessage = data.correct_answer ? '<br>The correct country was: <span style="color:red;">' + data.correct_answer + '</span>. ' : '<br>';
-                            if (data.prompt_for_name_message) {
-                                // Show a modal to get the user's name and message
-                                $("#name-message-modal").dialog({
-                                    open: function() {
-                                    },
-                                    close: function() {
-                                        // This will be executed when the name-message-modal is closed
-                                        showRestartModal(data.score, data.correct_answer);
-                                    }
-                                }).dialog("open").dialog("moveToTop");
-                            } else {
-                                showRestartModal(data.score, data.correct_answer);
+                        displayGuessMessage(selectedCountry, data.distance.toFixed(0), data.angle);
+                        setTimeout(function() {
+                            if (tries <= 0) {
+                                // Show all Xs and set "tries left" to 0
+                                let finalScore = data.score;
+                                let correctAnswerMessage = data.correct_answer ? '<br>The correct country was: <span style="color:red;">' + data.correct_answer + '</span>. ' : '<br>';
+                                if (data.prompt_for_name_message) {
+                                    // Show a modal to get the user's name and message
+                                    $("#name-message-modal").dialog({
+                                        open: function() {
+                                        },
+                                        close: function() {
+                                            // This will be executed when the name-message-modal is closed
+                                            showRestartModal(data.score, data.correct_answer);
+                                        }
+                                    }).dialog("open").dialog("moveToTop");
+                                } else {
+                                    showRestartModal(data.score, data.correct_answer);
+                                }
                             }
-                        } else {
-                            {% comment %} let angle = data.angle;
-                            let arrowImage = `<img class="inline-arrow" style="transform: rotate(${angle}deg);" src="{% static 'sattle/arrow_up.svg' %}" alt="Direction Arrow">`;
-                            let message = `The distance from the center of ${selectedCountry} to the image coordinates is ${data.distance.toFixed(0)} km, direction: ${arrowImage}`; {% endcomment %}
-                            displayGuessMessage(selectedCountry, data.distance.toFixed(0), data.angle);
-                        }
+                        }, 1150);
                     }
                     $("button[type='submit']").prop("disabled", false);
                 }).fail(function() {  // handle network errors or server errors

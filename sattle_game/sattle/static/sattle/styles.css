@@ -3,6 +3,14 @@ html, body {
     padding: 0;
     height: 100%;
 }
+:root {
+    --primary-color: #007BFF;
+    --primary-color-hover: #0056b3;
+    --secondary-color: #f8f9fa;
+    --secondary-color-hover: #e2e6ea;
+    --border-color: #ced4da;
+    --error-color: #e3342f;
+}
 
 body {
     font-family: 'Arial', sans-serif;
@@ -10,32 +18,13 @@ body {
 }
 
 .container {
-    display: grid;
-    grid-template-columns: 1fr 3fr 1fr;
+    /* Changed the column definition to occupy the full width */
+    grid-template-columns: 1fr;
     align-items: center;
     justify-content: center;
     height: 100%;
     padding: 20px;
     overflow-y: auto;
-}
-
-.score-container, 
-.tries-skips-container,
-.skips-container, 
-.tries-container {
-    text-align: center;
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.tries-skips-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
 }
 
 .main-content {
@@ -52,9 +41,9 @@ h1 {
 }
 
 .satellite-image {
-    width: 100%;
+    width: 50%;
     height: auto;
-    max-height: 70vh;
+    max-height: 55vh;
     border-radius: 12px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
@@ -63,53 +52,6 @@ skip-button[disabled] {
     background-color: #ccc;
     cursor: not-allowed;
     margin-top: 20px;
-}
-
-.feedback-container, 
-.correct-feedback, 
-.incorrect-feedback {
-    margin-top: 20px;
-    display: none;
-    font-size: 1.5em;
-    margin-right: 10px;
-}
-
-.correct-feedback {
-    color: green;
-}
-
-.incorrect-feedback {
-    color: red;
-    display: none;
-}
-
-#feedback-btn, 
-.record-score-btn {
-    font-size: 16px;
-    margin: 0;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.record-score-btn {
-    background-color: #7faeff;
-    color: #fff;
-}
-
-.record-score-btn:hover {
-    background-color: #5f8eff;
-}
-
-#feedback-btn {
-    background-color: #ff7f7f;
-    color: #fff;
-}
-
-#feedback-btn:hover {
-    background-color: #ff5f5f;
 }
 
 #feedback-modal, 
@@ -194,28 +136,52 @@ skip-button[disabled] {
 #name-message-modal button[type="submit"]:hover {
     background-color: #0056b3;
 }
-
-.buttons-container {
+.skips-container {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    flex-direction: row; /* Ensure they are in a row */
-    justify-content: space-between; /* Space them out */
-    align-items: center; /* Align vertically */
+    align-items: center;
+    justify-content: center;
+    background: #F5F5F5; /* Light gray */
 }
 
-.logo {
-    max-width: 50%; /* Ensures the logo doesn't overflow its container */
-    height: auto; /* Maintains the aspect ratio */
-    display: block; /* Makes the image a block element */
-    margin: 0 auto; /* Centers the logo if it's smaller than its container */
-    margin-bottom: 15px; /* Space below the logo */
+.skips-detail {
+    margin: 0;  
+    padding: 0;  
+    margin-right: 20px;  
+    line-height: 1.5; 
+    align-self: center;
+    color: #555555;  /* Darker gray for the text for contrast */
+    margin-top: 10px;
 }
+
+#skip-button {
+    padding: 8px 12px;
+    line-height: 1;
+    cursor: pointer;
+    background: #e6e6e6; /* Slightly darker gray for the button */
+    border: 1px solid #BDBDBD; /* Border for definition */
+    color: #333333; /* Even darker gray for the text */
+    border-radius: 4px;
+}
+
+#skip-button:hover {
+    background: #D0D0D0; /* A bit darker on hover for visual feedback */
+}
+.correct-feedback {
+    padding: 10px;
+    background-color: #e0f7fa;
+    border: 1px solid #a2d5f2;
+    border-radius: 5px;
+    margin: 5px 0;
+    text-align: center;
+    color: #0077c2;
+    font-weight: bold;
+}
+
 .divider {
     width: 80%; /* Adjust width as needed */
     height: 1px; /* Thin line */
     background: linear-gradient(to right, transparent, #ccc, transparent);
-    margin: 20px auto; /* Vertical spacing and centering */
+    margin: 10px auto; /* Vertical spacing and centering */
     opacity: 0.7; /* Slight transparency for a softer look */
 }
 #global-high-scores-modal {
@@ -256,24 +222,7 @@ skip-button[disabled] {
     width: 100%; /* Full width */
     table-layout: fixed; /* Fixed layout for performance */
 }
-.restart-btn {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    border-radius: 5px;
-    margin: 10px 0;
-}
 
-.restart-btn:hover {
-    background-color: darkred;
-}
-#feedback-btn, .record-score-btn, .restart-btn {
-    box-sizing: border-box;  /* Ensure padding and border are included in total height */
-    height: 40px;            /* Explicitly set a height */
-}
 .restart-message {
     padding: 20px;
     background: linear-gradient(135deg, #fdfdfd, #f9f9f9);  /* Subtle gradient for elegance */
@@ -299,36 +248,258 @@ skip-button[disabled] {
 
 .guess-history {
     padding: 20px;
-    border: 2px solid #efefef;
-    border-radius: 10px; /* Added border-radius for rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Added subtle shadow */
-    max-height: 150px;
-    overflow-y: auto; /* Changed scroll to auto so the scrollbar only appears when needed */
-    background-color: #fafafa; /* Light grey background for contrast */
+    border: 2px solid #b0e0a8; /* Soft green border */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    max-height: 250px;
+    overflow-y: auto;
+    background-color: #e8f5e1; /* Light muted green background */
+    width: 47%;
+    margin: 0 auto; /* Center the form */
 }
+
 
 .guess-entry {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 12px; /* Padding for individual entries */
-    background-color: white; /* Solid white background */
+    background-color: #ffffff;
     border-radius: 5px; /* Rounded corners for each entry */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* A subtle shadow for depth */
     margin-bottom: 10px; /* Increased margin for better spacing */
     transition: background-color 0.3s; /* Transition effect for hover */
 }
-
-/* Add a hover effect to guess entries */
-.guess-entry:hover {
-    background-color: #f5f5f5; /* Light grey on hover */
+.guess-entry:hover{
+    background-color: #f0eeee;
 }
 
-.buttons-container button,
-.buttons-container p.record-score-btn {
+.buttons-container {
+    width: 50%;  /* Reduce the width to half */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px auto; /* Vertical spacing and centering */
+}
+
+.buttons-container > * {
+    margin: 0; 
+    padding: 5px 0; /* Adjust this to your need. Here, I've added vertical padding to center align items */
+}
+
+#your-form-id {
+    width: 50%; /* Set the form's width to match the top-section */
+    margin: 0 auto; /* Center the form */
+}
+
+#your-form-id input[type="text"] {
+    font-size: 18px;
+    padding: 10px 15px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+#your-form-id input[type="text"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+#your-form-id button[type="submit"] {
+    font-size: 18px;
+    padding: 10px 15px;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: none;
+    background-color: var(--primary-color);
+    color: #fff;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#your-form-id button[type="submit"]:hover {
+    background-color: var(--primary-color-hover);
+}
+
+#your-form-id button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+#your-form-id button[type="submit"]:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+#skip-button:disabled {
+    background-color: #f1f1f1;
+    cursor: not-allowed;
+}
+/* Parent container for the top section to use Flex */
+.top-section {
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    margin: 0 auto;
+    padding: 5px 0; /* Reduced the padding to make the section smaller */
+}
+
+.left-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch; /* Ensure children stretch the full width of this container */
+}
+
+#feedback-btn {
+    order: 2;
+    align-self: center; /* Center the button within its container */
+    width: 100%; /* Set button width to 100% of its container */
+    padding: 5px 10px; 
+    font-size: 0.9em;
+}
+
+
+.logo {
+    order: 1; 
+    width: 100%;; /* let the width adjust automatically */
+    max-width: 77%; /* maximum width it can take */
+    height: auto; /* let the height adjust according to width */
+    align-self: center; /* vertically align the logo in the center */
+}
+
+.score-container {
+    text-align: center;
+    background: #e6e6e6;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align content to the start/left */
+    border: 1px solid rgba(0, 0, 0, 0.05); /* A subtle border */
+    order: 1;
+    width: 65%; /* Set score-container width to 100% of its container */
+}
+.score-container p {
+    margin: 5px 0;
+    font-size: 0.7em; /* Slightly larger font for better readability */
+}
+
+.score-container span {
+    font-weight: 600; /* Bold font for scores */
+    font-size: 13px; /* Emphasize the scores more */
+}
+
+/* Common styles for all buttons */
+.button, .feedback-btn, .restart-btn, .record-score-btn, .skip-button {
+    font-family: 'Arial', sans-serif;
     font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 10px;
 }
+
+.button:hover, .feedback-btn:hover, .restart-btn:hover, .record-score-btn:hover, .skip-button:hover {
+    transform: scale(1.05);
+}
+
+.button:focus, .feedback-btn:focus, .restart-btn:focus, .record-score-btn:focus, .skip-button:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Feedback - blue */
+.feedback-btn {
+    background-color: #4A90E2;
+    color: #FFFFFF;
+}
+
+.feedback-btn:hover {
+    background-color: #357ABD;
+}
+
+.restart-btn {
+    background-color: #FF5F5F; /* A bright shade of red */
+    color: #FFFFFF;
+}
+
+.restart-btn:hover {
+    background-color: #E54747; /* A slightly darker shade of red for the hover effect */
+}
+
+/* High Scores - green */
+.record-score-btn {
+    background-color: #7ED321;
+    color: #FFFFFF;
+    margin-left: 35px;
+}
+
+.record-score-btn:hover {
+    background-color: #5BA714;
+}
+
+.placeholder-entry {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 25px; /* Assuming a standard height, adjust as required */
+    font-style: italic;
+    color: #a8a8a8; /* Adjust color to preference */
+}
+
+
 @media (max-width: 768px) {
+
+
+    .buttons-container {
+        flex-direction: row;  /* Change from column to row */
+        flex-wrap: wrap; 
+        width: 90%;
+        align-items: center;  
+    }
+    .record-score-btn{
+        margin-left: 0;
+    }
+    .record-score-btn, 
+    #restart-btn {
+        margin: 5px 1%;
+        box-sizing: border-box; /* To make sure padding and border don't increase the button's size */
+        align-items: center;  /* Align the content in the center */
+        display: flex;  /* To use the align-items property */
+        justify-content: center; /* Center the content horizontally */
+    }
+
+    .record-score-btn{
+        width: 60%; 
+    }
+    .restart-btn{
+        width: 35%;
+    }
+    .buttons-container > .skips-container {
+        flex-basis: 100%; /* Takes full width */
+        margin-top: 10px; 
+    }
+    #your-form-id {
+        width: 100%; /* Set the form's width to match the top-section */
+        margin: 0 auto; /* Center the form */
+    }
+    .logo {
+        max-width: 100%; /* maximum width it can take */
+    }
+    .score-container {
+        width: 73%; /* Set score-container width to 100% of its container */
+    }
+    .top-section {
+        width: 100%;
+    }
+    
     #high-scores-table th, #high-scores-table td {
         padding: 8px; /* Slightly reduce padding for smaller screens */
         font-size: 12px; /* Reduce font size for mobile */
@@ -360,107 +531,9 @@ skip-button[disabled] {
     }
 
     .satellite-image {
-        max-width: 100%;
-        max-height: 40vh; /* Set a maximum height relative to the viewport */
+        width: 100%;
+        max-height: 50vh; /* Set a maximum height relative to the viewport */
         margin-bottom: 10px; /* Reduced space below the image */
-    }
-
-    .score-container, .tries-skips-container {
-        width: 35%; /* Same width for both containers */
-        position: absolute;
-        margin-top: 10px;
-        height: 90px;
-    }
-
-    .score-container {
-        bottom: -190px; /* Adjusted position */
-        left: 5%; /* Adjusted to give more space */
-    }
-
-    .tries-skips-container {
-        bottom: -190px; /* Adjusted position */
-        right: 5%; /* Adjusted to give more space */
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    .tries-container .incorrect-feedback {
-        font-size: 1em; /* Adjust this value to your preference */
-        margin-right: 5px; /* Adjust spacing between X's if needed */
-    }
-    .skips-container, .tries-container {
-        flex: 1; /* This ensures both containers take up equal space within the parent */
-        max-width: 50%; /* Ensuring neither grows beyond half the parent's width */
-        padding: 0 10px; /* Adding some padding for spacing */
-    }
-
-    .buttons-container {
-        flex-direction: column;
-        align-items: center;
-        clear: both;
-        justify-content: space-between; /* This will push the buttons to the left and right */
-        flex-direction: row; /* Change direction to row */
-        width: 100%; /* Take up full width */
-    }
-    .buttons-container button,
-    .buttons-container p.record-score-btn {
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center; /* ensures text inside the element is centered */
-        height: 40px;
-    }
-    #your-form-id label {
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    #your-form-id input[type="text"] {
-        font-size: 18px; /* Increase font size */
-        padding: 10px 15px; /* Increase padding for better touch */
-        width: 100%; /* Full width */
-        box-sizing: border-box; /* To ensure padding and border are included in width */
-        margin-bottom: 10px; /* Space between the field and the button */
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    #your-form-id button[type="submit"] {
-        font-size: 18px; /* Increase font size */
-        padding: 10px 15px; /* Increase padding for better touch */
-        width: 100%; /* Full width */
-        box-sizing: border-box; /* To ensure padding and border are included in width */
-        cursor: pointer; /* Indicates clickable */
-        border: none; /* Remove default border */
-        background-color: #007BFF; /* Example color */
-        color: #fff; /* Text color */
-        border-radius: 5px; /* Rounded corners */
-        transition: background-color 0.3s ease; /* Smooth color transition */
-    }
-
-    #your-form-id button[type="submit"]:hover {
-        background-color: #0056b3; /* Darker shade on hover */
-    }
-    #feedback-btn, 
-    .record-score-btn {
-        font-size: 14px; /* Decrease font size for mobile */
-        padding: 8px 16px; /* Adjust padding for mobile */
-    }
-
-    #feedback-btn {
-        margin-right: auto; /* Pushes the button to the left */
-    }
-
-    .record-score-btn {
-        margin-left: auto; /* Pushes the button to the right */
-    }
-    #distance-message {
-        position: relative; /* Set position to relative (or absolute/fixed/sticky as per your requirement) */
-        z-index: 1000; /* High z-index value to ensure it's on top */
-    }
-    .inline-arrow {
-        position: relative; /* Set position to relative (or absolute/fixed/sticky as per your requirement) */
-        z-index: 1000; /* High z-index value to ensure it's on top */
     }
     .divider {
         width: 90%; /* Adjust width for smaller screens */
@@ -476,30 +549,8 @@ skip-button[disabled] {
         width: calc(100% - 30px);
         padding: 20px 15px; /* Add 15px horizontal padding to match the input/button */
         margin: 0 auto; /* Centering the element if it doesn't span the entire width */
-        max-height: 200px;
-    }
-    /* Style guess-entry */
-    .guess-entry {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 14px;
-        background-color: white;
-        border-radius: 7px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        margin-bottom: 12px;
-        transition: background-color 0.3s;
-
-        /* This will make sure text doesn't break too early and utilize the available space */
-        flex-wrap: nowrap;
+        max-height: 250px;
     }
 
-    /* Adjust the country span to occupy more width and push other items to the right */
-    .guess-entry span:first-child {
-        flex: 1 0 auto;
-        white-space: nowrap; /* Prevent the text from breaking onto multiple lines */
-        overflow: hidden;   /* Hide the excess text */
-        text-overflow: ellipsis; /* Display '...' for the overflowed content */
-    }
 }
 
