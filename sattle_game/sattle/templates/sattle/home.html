@@ -496,6 +496,7 @@
                             $(".guess-history .correct-feedback").text("Correct!"); // Change the message if needed
                             $(".guess-history .correct-feedback").fadeIn().delay(700).fadeOut(300);
                             setTimeout(function(){
+                                tries = full_tries; // reset the tries if the answer is correct    
                                 resetGuessHistory();
                                 updateScore(data.score);
                                 $("#high-score").text(data.user_high_score);
@@ -509,7 +510,7 @@
                                 }        
                                 updateImage(data.new_image_url);
                                 updateImageId(data.new_image_id);
-                                tries = full_tries; // reset the tries if the answer is correct    
+                                
                             },1000)
                         }, 1350);
                     } else {
