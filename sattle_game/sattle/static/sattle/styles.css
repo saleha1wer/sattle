@@ -365,10 +365,10 @@ skip-button[disabled] {
 
 .logo {
     order: 1; 
-    width: 100%;; /* let the width adjust automatically */
-    max-width: 77%; /* maximum width it can take */
+    max-width: 63%; /* maximum width it can take */
     height: auto; /* let the height adjust according to width */
     align-self: center; /* vertically align the logo in the center */
+    margin-right: 60px;
 }
 
 .score-container {
@@ -382,16 +382,16 @@ skip-button[disabled] {
     align-items: flex-start; /* Align content to the start/left */
     border: 1px solid rgba(0, 0, 0, 0.05); /* A subtle border */
     order: 1;
-    width: 65%; /* Set score-container width to 100% of its container */
+    width: 80%; /* Set score-container width to 100% of its container */
 }
 .score-container p {
     margin: 5px 0;
-    font-size: 0.7em; /* Slightly larger font for better readability */
+    font-size: 1.2em; /* Slightly larger font for better readability */
 }
 
 .score-container span {
     font-weight: 600; /* Bold font for scores */
-    font-size: 13px; /* Emphasize the scores more */
+    font-size: 1.2em; /* Emphasize the scores more */
 }
 
 /* Common styles for all buttons */
@@ -456,7 +456,15 @@ skip-button[disabled] {
 
 
 @media (max-width: 768px) {
-
+    .score-container p {
+        margin: 5px 0;
+        font-size: 0.8em; /* Slightly larger font for better readability */
+    }
+    
+    .score-container span {
+        font-weight: 600; /* Bold font for scores */
+        font-size: 0.8em; /* Emphasize the scores more */
+    }
 
     .buttons-container {
         flex-direction: row;  /* Change from column to row */
