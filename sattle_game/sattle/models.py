@@ -36,6 +36,8 @@ class Feedback(models.Model):
     feedback_text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     user_identifier = models.CharField(max_length=255, null=True, blank=True)
+    response_info = models.CharField(max_length=255, null=True, blank=True)  # New field for email or Discord
+
 
 class UserScore(models.Model):
     user_identifier = models.CharField(max_length=255, unique=True)

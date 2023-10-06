@@ -67,6 +67,15 @@ skip-button[disabled] {
     resize: vertical;
 }
 
+#feedback-text, #response-info {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;  /* Add a bit of space between the textarea and the input field */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;  /* Ensures padding doesn't make the input wider than 100% */
+}
+
 #feedback-form button[type="submit"] {
     background-color: #4CAF50;
     color: #fff;
@@ -81,7 +90,6 @@ skip-button[disabled] {
 #feedback-form button[type="submit"]:hover {
     background-color: #45a049;
 }
-
 .inline-arrow {
     display: inline-block;
     width: 25px;

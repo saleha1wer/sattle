@@ -259,7 +259,13 @@ def submit_feedback(request):
     if request.method == 'POST':
         feedback_text = request.POST.get('feedback')
         user_identifier = request.COOKIES.get('user_identifier', 'unknown')
-        Feedback.objects.create(feedback_text=feedback_text, user_identifier=user_identifier)
+        response_info = request.POST.get('response_info', None)  # Get the optional email or Discord handle
+
+        Feedback.objects.create(
+            feedback_text=feedback_text, 
+            user_identifier=user_identifier, 
+            response_info=response_info  # Store it in the database
+        )
         return JsonResponse({"success": True})
     return JsonResponse({"success": False})
 

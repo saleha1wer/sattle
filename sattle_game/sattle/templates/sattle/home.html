@@ -57,9 +57,10 @@
         <div id="feedback-modal" title="Give Feedback" style="display:none;">
             <form id="feedback-form">
                 <textarea placeholder="Write your feedback or feature suggestions here" id="feedback-text" rows="5" cols="50"></textarea>
+                <input type="text" id="response-info" placeholder="(Optional) Email or Discord for responses">
                 <button type="submit">Submit</button>
             </form>
-        </div>
+        </div>        
         <div id="name-message-modal" title="Congratulations!" style="display:none;">
             <p>You've set a new global high score! Enter your name and a message for the leaderboard:</p>
             <form id="name-message-form">
@@ -241,7 +242,8 @@
                 submitButton.prop("disabled", true);  // Disable the button
             
                 $.post("{% url 'submit_feedback' %}", {
-                    feedback: $("#feedback-text").val()
+                    feedback: $("#feedback-text").val(),
+                    response_info: $("#response-info").val()  // Sending the email or Discord info
                 }, function(data) {
                     if (data.success) {
                         $("#feedback-modal").dialog("close");
@@ -255,7 +257,7 @@
                     alert("Error submitting feedback. Please try again.");
                     submitButton.prop("disabled", false);  // Re-enable the button
                 });
-            });
+            });            
             $("#feedback-modal").dialog({
                 autoOpen: false,  // This ensures the dialog doesn't open on page load
                 modal: true,      // This makes it a modal dialog
