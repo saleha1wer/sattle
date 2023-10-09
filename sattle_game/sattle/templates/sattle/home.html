@@ -495,7 +495,7 @@
                     if (data.correct) {
                         displayCorrectFeedback(selectedCountry, data.angle);
                         setTimeout(function() {
-                            $(".guess-history .correct-feedback").text("Correct!"); // Change the message if needed
+                            $(".guess-history .correct-feedback").text(`Correct! Your current score is ${data.score}`);
                             $(".guess-history .correct-feedback").fadeIn().delay(700).fadeOut(300);
                             setTimeout(function(){
                                 tries = full_tries; // reset the tries if the answer is correct    
